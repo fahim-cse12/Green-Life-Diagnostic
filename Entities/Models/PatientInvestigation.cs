@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entities.Models
 {
     public class PatientInvestigation : BaseEntity
     {
+        [Column("PatientInvestigationId")]
+        public Guid Id { get; set; }
+        [ForeignKey(nameof(Patient))]
         public Guid PatientId { get; set; }
-        public Patient Patient { get; set; }
+        [ForeignKey(nameof(Doctor))]
         public Guid DoctorId { get; set; }
-        public Doctor Doctor { get; set; }
+        [ForeignKey(nameof(Investigation))]
         public Guid InvestigationId { get; set; }
-        public Investigation Investigation { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal DueAmount { get; set; }
+        public decimal PayAmount { get; set; }
         public DateTime DeliveryDate { get; set; }
         public bool IsDelivered { get; set; }
     }
