@@ -15,6 +15,6 @@ namespace Service.Contracts
         ITicketService ticketService { get; }   
         IFinancialService financialService { get; }
         IUserService userService { get; }
-        IAuthenticationService AuthenticationService { get; }
+        IAuthenticationService authenticationService { get; }
     }
 }

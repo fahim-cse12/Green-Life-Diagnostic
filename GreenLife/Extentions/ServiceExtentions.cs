@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Repository;
 using Service.Contracts;
 using Service;
+using Entities.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace GreenLife.Extentions
 {
@@ -30,5 +32,20 @@ namespace GreenLife.Extentions
                                     services.AddScoped<IRepositoryManager, RepositoryManager>();
         public static void ConfigureServiceManager(this IServiceCollection services) =>
                                          services.AddScoped<IServiceManager, ServiceManager>();
+
+        public static void ConfigureIdentity(this IServiceCollection services)
+        {
+            var builder = services.AddIdentity<User, IdentityRole>(o =>
+            {
+                o.Password.RequireDigit = true;
+                o.Password.RequireLowercase = false;
+                o.Password.RequireUppercase = false;
+                o.Password.RequireNonAlphanumeric = false;
+                o.Password.RequiredLength = 10;
+                o.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<RepositoryContext>()
+            .AddDefaultTokenProviders();
+        }
     }
 }
