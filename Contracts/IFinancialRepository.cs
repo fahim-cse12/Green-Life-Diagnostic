@@ -12,7 +12,7 @@ namespace Contracts
         Task<IEnumerable<FinancialRecord>> GetAllFinancialRecordAsync(bool trackChanges);
         Task<FinancialRecord> GetFinancialRecordAsync(Guid financialRecordId, bool trackChanges);
         void CreateFinancialRecord(FinancialRecord financialRecord);
-        Task<IEnumerable<FinancialRecord>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
+        //Task<IEnumerable<FinancialRecord>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
         void DeleteFinancialRecord(FinancialRecord financialRecord);
     }
 }

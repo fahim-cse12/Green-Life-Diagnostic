@@ -12,7 +12,6 @@ namespace Contracts
         Task<IEnumerable<Doctor>> GetAllDoctorAsync(bool trackChanges);
         Task<Doctor> GetDoctorAsync(Guid doctorId, bool trackChanges);
         void CreateDoctor(Doctor doctor);
-        Task<IEnumerable<Doctor>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
         void DeleteDoctor(Doctor doctor);
     }
 }

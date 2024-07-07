@@ -9,6 +9,7 @@ namespace GreenLife
         public MappingProfile() 
         {
             CreateMap<UserForRegistrationDto, User>();
+            CreateMap<DoctorDto, Doctor>();
         } 
        
     }

@@ -6,6 +6,9 @@ using Service.Contracts;
 using Service;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
+using Asp.Versioning;
+using GreenLife.Presentation.Controllers;
 
 namespace GreenLife.Extentions
 {
@@ -33,6 +36,22 @@ namespace GreenLife.Extentions
         public static void ConfigureServiceManager(this IServiceCollection services) =>
                                          services.AddScoped<IServiceManager, ServiceManager>();
 
+        public static void ConfigureVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(opt =>
+            {
+                opt.ReportApiVersions = true;
+                opt.AssumeDefaultVersionWhenUnspecified = true;
+                opt.DefaultApiVersion = new ApiVersion(1, 0);
+                opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            }).AddMvc(opt =>
+            {
+                opt.Conventions.Controller<DoctorController>()
+                   .HasApiVersion(new ApiVersion(1, 0));
+              
+            });
+        }
+
         public static void ConfigureIdentity(this IServiceCollection services)
         {
             var builder = services.AddIdentity<User, IdentityRole>(o =>
@@ -47,5 +66,19 @@ namespace GreenLife.Extentions
             .AddEntityFrameworkStores<RepositoryContext>()
             .AddDefaultTokenProviders();
         }
+
+        public static void ConfigureSwagger(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(s =>
+            {
+                s.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Green Life API",
+                    Version = "v1"
+                });
+                
+            });
+        }
+
     }
 }
