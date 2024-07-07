@@ -1,4 +1,7 @@
+using GreenLife;
 using GreenLife.Extentions;
+using GreenLife.Presentation;
+using LoggerService;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 
@@ -13,8 +16,25 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureLoggerService();
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddControllers(config =>
+{
+    config.RespectBrowserAcceptHeader = true;
+    config.ReturnHttpNotAcceptable = true;
+    //config.InputFormatters.Insert(0, GetJsonPatchInputFormatter());
+}).AddXmlDataContractSerializerFormatters()
+ // .AddCustomCSVFormatter()
+  .AddApplicationPart(typeof(AssemblyReference).Assembly);
 
 var app = builder.Build();
+
+app.UseExceptionHandler(opt => { });
+
+var logger = app.Services.GetRequiredService<ILoggerManager>();
+app.ConfigureExceptionHandler(logger);
+if (app.Environment.IsProduction())
+    app.UseHsts();
 
 if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();

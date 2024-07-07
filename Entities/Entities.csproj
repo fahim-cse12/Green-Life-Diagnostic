@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="LinkModels\" />
+    <Compile Remove="LinkModels\**" />
+    <EmbeddedResource Remove="LinkModels\**" />
+    <None Remove="LinkModels\**" />
   </ItemGroup>
 
   <ItemGroup>
