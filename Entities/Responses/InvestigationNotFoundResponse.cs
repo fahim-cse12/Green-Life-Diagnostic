@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GreenLife.Presentation
+namespace Entities.Responses
 {
-    public static class AssemblyReference
+    internal class InvestigationNotFoundResponse
     {
-
     }
 }

@@ -16,7 +16,7 @@ namespace Entities.Models
         public string Name { get; set; }
         public decimal Fee { get; set; }
         [MaxLength(200)]
-        public string Specialty { get; set; }
+        public string Speciality { get; set; }
         [MaxLength(100)]
         public string ScheduledDay { get; set; }
     }

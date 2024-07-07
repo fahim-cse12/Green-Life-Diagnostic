@@ -12,7 +12,6 @@ namespace Contracts
         Task<IEnumerable<Investigation>> GetAllInvestigationAsync(bool trackChanges);
         Task<Investigation> GetInvestigationAsync(Guid investigationId, bool trackChanges);
         void CreateInvestigation(Investigation investigation);
-        Task<IEnumerable<Investigation>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
         void DeleteInvestigation(Investigation investigation);
     }
 }

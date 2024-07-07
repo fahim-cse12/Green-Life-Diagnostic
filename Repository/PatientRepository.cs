@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,25 @@ namespace Repository
     {
         public PatientRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         { }
+
+        public void CreatePatient(Patient patient)
+        {
+            Create(patient);
+        }
+
+        public void DeletePatient(Patient patient)
+        {
+            Delete(patient);    
+        }
+
+        public async Task<IEnumerable<Patient>> GetAllPatientsAsync(bool trackChanges)
+        {
+            return await FindAll(trackChanges).OrderBy(i => i.Id).ToListAsync();
+        }
+
+        public async Task<Patient> GetPatientAsync(Guid patientId, bool trackChanges)
+        {
+            return await FindByCondition(x => x.Id.Equals(patientId), trackChanges).SingleOrDefaultAsync();
+        }
     }
 }

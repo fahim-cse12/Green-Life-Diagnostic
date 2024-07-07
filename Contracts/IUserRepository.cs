@@ -12,7 +12,7 @@ namespace Contracts
         Task<IEnumerable<User>> GetAllUserAsync(bool trackChanges);
         Task<User> GetUserAsync(Guid userId, bool trackChanges);
         void CreateUSer(User user);
-        Task<IEnumerable<User>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
+        
         void DeleteUser(User user);
     }
 }

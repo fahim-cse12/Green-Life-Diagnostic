@@ -34,10 +34,10 @@ namespace Service
         public IDoctorService doctorService => _doctorService.Value;
         public IPatientService patientService => _patientService.Value;
         public IPatientInvestigationService patientInvestigationService => _patientInvesitgationService.Value;
-        public IInvestigationService investigationService => _investigationService.Value;
+        public IInvestigationService investigationService => _investigationService.Value; 
         public ITicketService ticketService => _ticketService.Value;
         public IFinancialService financialService => _financialService.Value;
         public IUserService userService => _userService.Value;  
-        public IAuthenticationService AuthenticationService => _authenticationService.Value;
+        public IAuthenticationService authenticationService => _authenticationService.Value;
     }
 }
