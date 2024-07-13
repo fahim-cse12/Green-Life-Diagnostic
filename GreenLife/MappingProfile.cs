@@ -8,8 +8,15 @@ namespace GreenLife
     {
         public MappingProfile() 
         {
-            CreateMap<UserForRegistrationDto, User>();
-            CreateMap<DoctorDto, Doctor>();
+            CreateMap<UserForRegistrationDto, User>().ReverseMap();
+            CreateMap<DoctorDto, Doctor>().ReverseMap();
+            CreateMap<PatientDto, Patient>().ReverseMap();
+            CreateMap<PatientInvestigationDto, PatientInvestigation>().ReverseMap();
+            CreateMap<InvestigationDto, Investigation>().ReverseMap();
+            CreateMap<TicketDto, Ticket>().ReverseMap();
+            CreateMap<FinancialRecordDto, FinancialRecord>().ReverseMap();
+            CreateMap<UserDto, User>().ReverseMap();
+            
         } 
        
     }
