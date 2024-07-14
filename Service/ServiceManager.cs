@@ -39,5 +39,7 @@ namespace Service
         public IFinancialService financialService => _financialService.Value;
         public IUserService userService => _userService.Value;  
         public IAuthenticationService authenticationService => _authenticationService.Value;
+
+        
     }
 }
