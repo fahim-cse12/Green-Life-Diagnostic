@@ -8,6 +8,7 @@ using FluentValidation;
 using LoggerService;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using System.ComponentModel.DataAnnotations;
 using System.Numerics;
 
 namespace Service
@@ -17,33 +18,33 @@ namespace Service
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+        private readonly IValidator<Doctor> _validator;
 
-        public DoctorService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        public DoctorService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper,
+            IValidator<Doctor> validator)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
-
+            _validator = validator; 
         }
 
         public async Task<ApiBaseResponse> CreateDoctorAsync(DoctorDto doctorDto)
         {
             var doctorEntity = _mapper.Map<Doctor>(doctorDto);
-            DoctorValidator validator = new DoctorValidator();
-            var validationResult = await validator.ValidateAsync(doctorEntity);
+            //var validationResult = await _validator.ValidateAsync(doctorEntity);
 
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-            else
-            {             
-                _repository.Doctor.CreateDoctor(doctorEntity);
-                await _repository.SaveAsync();
-                var doctorToReturn = _mapper.Map<DoctorDto>(doctorEntity);
-                return new ApiOkResponse<DoctorDto>(doctorToReturn, "Doctor created successfully");
-            }
-           
+            //if (!validationResult.IsValid)
+            //{
+            //    var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+            //    return new ApiErrorResponse("Validation failed", errorMessages);
+            //}
+
+            _repository.Doctor.CreateDoctor(doctorEntity);
+            await _repository.SaveAsync();
+
+            var doctorToReturn = _mapper.Map<DoctorDto>(doctorEntity);
+            return new ApiOkResponse<DoctorDto>(doctorToReturn, "Doctor created successfully");
 
         }
 

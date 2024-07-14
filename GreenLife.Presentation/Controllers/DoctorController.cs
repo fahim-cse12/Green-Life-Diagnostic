@@ -40,11 +40,25 @@ namespace GreenLife.Presentation.Controllers
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateDoctor([FromBody] DoctorDto doctorDto)
         {
-            var createdDoctor = await _service.doctorService.CreateDoctorAsync(doctorDto);
-            var createResponse = (ApiOkResponse<Guid>)createdDoctor;
-            return CreatedAtRoute("DoctorById", new { id = createResponse.Result }, createResponse);
-            //return CreatedAtRoute("DoctorById", new { id = createdDoctor.Id }, createdDoctor);
+            var response = await _service.doctorService.CreateDoctorAsync(doctorDto);
+
+            if (response is ApiErrorResponse errorResponse)
+            {
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
+            }
+
+            var createResponse = (ApiOkResponse<DoctorDto>)response;
+            return CreatedAtRoute("DoctorById", new { id = createResponse.Result.Id }, createResponse);
         }
+
+        //[HttpPost(Name = "CreateTicket")]
+        //[ServiceFilter(typeof(ValidationFilterAttribute))]
+        //public async Task<IActionResult> CreateTicket([FromBody] TicketDto ticketDto)
+        //{
+           
+        //    return Ok("Nothing Happen");
+        //}
+
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteDoctor(Guid id)

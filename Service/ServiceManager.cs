@@ -2,8 +2,10 @@
 using Contracts;
 using Entities.ConfigurationModels;
 using Entities.Models;
+using FluentValidation;
 using LoggerService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Service.Contracts;
 
@@ -11,6 +13,7 @@ namespace Service
 {
     public class ServiceManager : IServiceManager
     {
+
         private readonly Lazy<IDoctorService> _doctorService;
         private readonly Lazy<IPatientService> _patientService;
         private readonly Lazy<IPatientInvestigationService> _patientInvesitgationService;
@@ -19,10 +22,21 @@ namespace Service
         private readonly Lazy<IFinancialService> _financialService;
         private readonly Lazy<IUserService> _userService;
         private readonly Lazy<IAuthenticationService> _authenticationService;
-        public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger,
-              IMapper mapper, UserManager<User> userManager, IOptions<JwtConfiguration> configuration)
+
+        public ServiceManager(
+            IRepositoryManager repositoryManager,
+            ILoggerManager logger,
+            IMapper mapper,
+            UserManager<User> userManager,
+            IOptions<JwtConfiguration> configuration,
+            IServiceProvider serviceProvider)
         {
-            _doctorService = new Lazy<IDoctorService>(() => new DoctorService(repositoryManager, logger, mapper));
+            _doctorService = new Lazy<IDoctorService>(() => new DoctorService(
+                repositoryManager,
+                logger,
+                mapper,
+                serviceProvider.GetRequiredService<IValidator<Doctor>>()));
+
             _patientService = new Lazy<IPatientService>(() => new PatientService(repositoryManager, logger, mapper));
             _patientInvesitgationService = new Lazy<IPatientInvestigationService>(() => new PatientInvestigationService(repositoryManager, logger, mapper));
             _investigationService = new Lazy<IInvestigationService>(() => new InvestigationService(repositoryManager, logger, mapper));
@@ -31,6 +45,7 @@ namespace Service
             _userService = new Lazy<IUserService>(() => new UserService(repositoryManager, logger, mapper));
             _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration));
         }
+
         public IDoctorService doctorService => _doctorService.Value;
         public IPatientService patientService => _patientService.Value;
         public IPatientInvestigationService patientInvestigationService => _patientInvesitgationService.Value;

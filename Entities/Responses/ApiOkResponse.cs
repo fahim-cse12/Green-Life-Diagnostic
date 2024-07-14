@@ -10,7 +10,7 @@ namespace Entities.Responses
     {
         public TResult Result { get; set; }
 
-        public ApiOkResponse(TResult result, string message = "Request was successful")
+        public ApiOkResponse(TResult result, string message = "")
             : base(true, message)
         {
             Result = result;
