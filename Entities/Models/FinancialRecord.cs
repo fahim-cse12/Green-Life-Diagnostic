@@ -14,7 +14,6 @@ namespace Entities.Models
         public Guid Id { get; set; }
 
         public DateTime Date { get; set; }
-        [MaxLength(250)] 
         public string Purpose { get; set; }
         public decimal Income { get; set; }
         public decimal Expense { get; set; }

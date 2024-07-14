@@ -32,13 +32,13 @@ namespace Service
         public async Task<ApiBaseResponse> CreateDoctorAsync(DoctorDto doctorDto)
         {
             var doctorEntity = _mapper.Map<Doctor>(doctorDto);
-            //var validationResult = await _validator.ValidateAsync(doctorEntity);
+            var validationResult = await _validator.ValidateAsync(doctorEntity);
 
-            //if (!validationResult.IsValid)
-            //{
-            //    var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-            //    return new ApiErrorResponse("Validation failed", errorMessages);
-            //}
+            if (!validationResult.IsValid)
+            {
+                var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return new ApiErrorResponse("Validation failed", errorMessages);
+            }
 
             _repository.Doctor.CreateDoctor(doctorEntity);
             await _repository.SaveAsync();

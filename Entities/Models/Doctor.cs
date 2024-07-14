@@ -12,12 +12,9 @@ namespace Entities.Models
     {
         [Column("DoctorId")]
         public Guid Id { get; set; }
-        [MaxLength(60)]
         public string Name { get; set; }
         public decimal Fee { get; set; }
-        [MaxLength(200)]
         public string Speciality { get; set; }
-        [MaxLength(100)]
         public string ScheduledDay { get; set; }
     }
 }

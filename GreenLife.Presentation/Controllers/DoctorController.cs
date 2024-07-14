@@ -37,7 +37,6 @@ namespace GreenLife.Presentation.Controllers
         }
 
         [HttpPost(Name = "CreateDoctor")]
-        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateDoctor([FromBody] DoctorDto doctorDto)
         {
             var response = await _service.doctorService.CreateDoctorAsync(doctorDto);
@@ -50,14 +49,6 @@ namespace GreenLife.Presentation.Controllers
             var createResponse = (ApiOkResponse<DoctorDto>)response;
             return CreatedAtRoute("DoctorById", new { id = createResponse.Result.Id }, createResponse);
         }
-
-        //[HttpPost(Name = "CreateTicket")]
-        //[ServiceFilter(typeof(ValidationFilterAttribute))]
-        //public async Task<IActionResult> CreateTicket([FromBody] TicketDto ticketDto)
-        //{
-           
-        //    return Ok("Nothing Happen");
-        //}
 
 
         [HttpDelete("{id:guid}")]

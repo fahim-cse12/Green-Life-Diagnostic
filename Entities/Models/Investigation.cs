@@ -12,10 +12,8 @@ namespace Entities.Models
     {
         [Column("InvestigationId")]
         public Guid Id { get; set; }
-        [MaxLength(100)]
         public string InvestigationName { get; set; }
         public decimal Cost { get; set; }
-        [MaxLength(500)]
         public string Description { get; set; }
     }
 }
