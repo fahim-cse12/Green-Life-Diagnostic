@@ -11,10 +11,11 @@ namespace Service.Contracts
     public interface IDoctorService
     {
         Task<ApiBaseResponse> GetAllDoctorAsync(bool trackChanges);
-        // Task<CompanyDto> GetCompanyAsync(Guid companyId, bool trackChanges);
         Task<ApiBaseResponse> GetDoctorAsync(Guid doctorId, bool trackChanges);
-        Task<DoctorDto> CreateDoctorAsync(DoctorDto doctorDto);
-        Task DeleteDoctorAsync(Guid doctorId, bool trackChanges);
-        Task UpdateDoctorAsync(Guid doctorId, DoctorDto doctorDto, bool trackChanges);
+        Task<ApiBaseResponse> CreateDoctorAsync(DoctorDto doctorDto);
+        Task<ApiBaseResponse> DeleteDoctorAsync(Guid doctorId, bool trackChanges);
+        Task<ApiBaseResponse> UpdateDoctorAsync(Guid doctorId, DoctorDto doctorDto, bool trackChanges);
+
+        Task<ApiBaseResponse> CreateTicketAsync(TicketDto ticketDto);
     }
 }

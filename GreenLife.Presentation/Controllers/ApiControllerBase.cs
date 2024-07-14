@@ -7,7 +7,7 @@ namespace GreenLife.Presentation.Controllers
 {
     public class ApiControllerBase : ControllerBase
     {
-        [HttpPost]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult ProcessError(ApiBaseResponse baseResponse)
         {
             return baseResponse switch

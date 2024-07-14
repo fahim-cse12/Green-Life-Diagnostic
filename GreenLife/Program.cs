@@ -39,7 +39,7 @@ builder.Services.AddControllers(config =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
-//builder.Services.ConfigureSwagger();
+builder.Services.ConfigureFluentValidation();
 
 var app = builder.Build();
 app.UseSwagger();

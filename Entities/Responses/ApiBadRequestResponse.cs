@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace Entities.Responses
 {
-    public abstract class ApiBadRequestResponse : ApiBaseResponse
+    public class ApiBadRequestResponse : ApiBaseResponse
     {
-        public string Message { get; set; }
-        public ApiBadRequestResponse(string message): base(false)
+        public ApiBadRequestResponse(string message) : base(false, message)
         {
-            Message = message;
         }
-
     }
 }

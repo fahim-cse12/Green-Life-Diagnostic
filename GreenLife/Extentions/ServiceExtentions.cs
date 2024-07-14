@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Asp.Versioning;
 using GreenLife.Presentation.Controllers;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using Entities.Validators;
 
 namespace GreenLife.Extentions
 {
@@ -35,6 +38,12 @@ namespace GreenLife.Extentions
                                     services.AddScoped<IRepositoryManager, RepositoryManager>();
         public static void ConfigureServiceManager(this IServiceCollection services) =>
                                          services.AddScoped<IServiceManager, ServiceManager>();
+
+        public static void ConfigureFluentValidation(this IServiceCollection services)
+        {
+            services.AddValidatorsFromAssemblyContaining<DoctorValidator>();
+            services.AddFluentValidationAutoValidation();
+        }
 
         public static void ConfigureVersioning(this IServiceCollection services)
         {
