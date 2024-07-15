@@ -50,8 +50,9 @@ namespace Service
 
         public async Task<ApiBaseResponse> GetAllDoctorAsync(bool trackChanges)
         {
-            var doctors = await _repository.Doctor.GetAllDoctorAsync(trackChanges);
-            var doctorsDto = _mapper.Map<IEnumerable<DoctorDto>>(doctors);
+            var doctorList = await _repository.Doctor.GetAllDoctorAsync(trackChanges);
+
+            var doctorsDto = _mapper.Map<IEnumerable<DoctorDto>>(doctorList);
             
             return new ApiOkResponse<IEnumerable<DoctorDto>>(doctorsDto, "");
         }
