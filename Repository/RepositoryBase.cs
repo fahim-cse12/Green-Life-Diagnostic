@@ -1,5 +1,7 @@
 ﻿using Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +21,27 @@ namespace Repository
         public void Create(T entity) => RepositoryContext.Set<T>().Add(entity);
         public void Update(T entity) => RepositoryContext.Set<T>().Update(entity);
         public void Delete(T entity) => RepositoryContext.Set<T>().Remove(entity);
+
+        //public void Rollback()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //public async Task ExecuteFromSqlRaw(string query, CancellationToken cancellationToken, SqlParameterExpression[] parameters = null)
+        //{
+        //    await RepositoryContext.Database.ExecuteSqlRawAsync(query, cancellationToken, parameters);
+        //}
+
+        //public IQueryable<T> GetFromSqlRaw(string query, SqlParameterExpression[] parmeters = null)
+        //{
+        //    return RepositoryContext.Set<T>().FromSqlRaw(query, parmeters);
+        //}
+
+       
+        //public async Task Rollback(CancellationToken cancellationToken)
+        //{
+        //    await _transaction.RollbackAsync(cancellationToken);
+        //    await _transaction.DisposeAsync();
+        //}
     }
 }

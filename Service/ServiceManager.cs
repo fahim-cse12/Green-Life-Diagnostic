@@ -37,7 +37,12 @@ namespace Service
                 mapper,
                 serviceProvider.GetRequiredService<IValidator<Doctor>>()));
 
-            _patientService = new Lazy<IPatientService>(() => new PatientService(repositoryManager, logger, mapper));
+            _patientService = new Lazy<IPatientService>(() => new PatientService(
+                repositoryManager,
+                logger,
+                mapper,
+                serviceProvider.GetRequiredService<IValidator<Patient>>()));
+
             _patientInvesitgationService = new Lazy<IPatientInvestigationService>(() => new PatientInvestigationService(repositoryManager, logger, mapper));
             _investigationService = new Lazy<IInvestigationService>(() => new InvestigationService(repositoryManager, logger, mapper));
             _ticketService = new Lazy<ITicketService>(() => new TicketService(repositoryManager, logger, mapper));

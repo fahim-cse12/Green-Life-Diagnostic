@@ -27,6 +27,7 @@ builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.ConfigureLoggerService();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
+builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.ConfigureVersioning();
 builder.Services.AddControllers(config =>
 {
@@ -62,8 +63,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.All
 });
 app.UseCors("CorsPolicy");
-//app.UseAuthentication();
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
 

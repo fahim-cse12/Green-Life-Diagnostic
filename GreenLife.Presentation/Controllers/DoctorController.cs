@@ -1,8 +1,6 @@
 ﻿using Entities.Responses;
-using GreenLife.Presentation.ActionFilter;
 using GreenLife.Presentation.Extentions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Service.Contracts;
 using Shared.DataTransferObject;
 
@@ -46,24 +44,32 @@ namespace GreenLife.Presentation.Controllers
                 return BadRequest(new { errorResponse.Message, errorResponse.Errors });
             }
 
-            var createResponse = (ApiOkResponse<DoctorDto>)response;
-            return CreatedAtRoute("DoctorById", new { id = createResponse.Result.Id }, createResponse);
+            return Created("", response);
         }
 
 
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteDoctor(Guid id)
         {
-            await _service.doctorService.DeleteDoctorAsync(id, trackChanges: false);
-            return NoContent();
+            var result = await _service.doctorService.DeleteDoctorAsync(id, trackChanges: false);
+            if (result is ApiErrorResponse errorResponse)
+            {
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
+            }
+            return Created("", result);
         }
 
         [HttpPut("{id:guid}")]
-        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateDoctor(Guid id, [FromBody] DoctorDto doctorDto)
         {
-            await _service.doctorService.UpdateDoctorAsync(id, doctorDto, trackChanges: true);
-            return NoContent();
+            var response = await _service.doctorService.UpdateDoctorAsync(id, doctorDto, trackChanges: true);
+
+            if (response is ApiErrorResponse errorResponse)
+            {
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
+            }
+
+            return Created("", response);
         }
 
     }

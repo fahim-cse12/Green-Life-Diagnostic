@@ -2,10 +2,10 @@
 {
     public record TicketDto : BaseDto
     {
-        public Guid Id { get; init; }
-        public Guid PatientId { get; init; }
-        public Guid DoctorId { get; init; }
-        public decimal Amount { get; init; }
-        public decimal Discount { get; init; }
+        public Guid Id { get; set; }
+        public Guid PatientId { get; set; }
+        public Guid DoctorId { get; set; }
+        public decimal Amount { get; set; }
+        public decimal Discount { get; set; }
     }
 }

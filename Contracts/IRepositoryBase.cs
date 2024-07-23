@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -14,5 +15,10 @@ namespace Contracts
         void Create(T entity);
         void Update(T entity);
         void Delete(T entity);
+        //Task BeginTransaction(CancellationToken cancellationToken);
+        //Task CommitAsync(CancellationToken cancellationToken);
+        //Task Rollback(CancellationToken cancellationToken);
+        //Task ExecuteFromSqlRaw(string query, CancellationToken cancellationToken, SqlParameterExpression[] parameters = null);
+        //IQueryable<T> GetFromSqlRaw(string query, SqlParameterExpression[] parmeters = null);
     }
 }

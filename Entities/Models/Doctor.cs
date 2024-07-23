@@ -16,5 +16,6 @@ namespace Entities.Models
         public decimal Fee { get; set; }
         public string Speciality { get; set; }
         public string ScheduledDay { get; set; }
+        public string ContactNo { get; set; }   
     }
 }

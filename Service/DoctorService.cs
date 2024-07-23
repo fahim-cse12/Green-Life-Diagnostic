@@ -3,13 +3,10 @@ using Contracts;
 using Entities.Exceptions;
 using Entities.Models;
 using Entities.Responses;
-using Entities.Validators;
 using FluentValidation;
 using LoggerService;
 using Service.Contracts;
 using Shared.DataTransferObject;
-using System.ComponentModel.DataAnnotations;
-using System.Numerics;
 
 namespace Service
 {
@@ -68,13 +65,25 @@ namespace Service
         public async Task<ApiBaseResponse> DeleteDoctorAsync(Guid doctorId, bool trackChanges)
         {
             var doctor = await _repository.Doctor.GetDoctorAsync(doctorId, trackChanges);
+            if (doctor is null)
+                return new IdNotFoundResponse<Doctor>(doctorId);
             doctor.Status = false;
+            _repository.Doctor.UpdateDoctor(doctor);
             await _repository.SaveAsync();
             return new ApiOkResponse<Guid>(doctorId, "Doctor Deleted Successfully");
         }
 
         public async Task<ApiBaseResponse> UpdateDoctorAsync(Guid doctorId, DoctorDto doctorDto, bool trackChanges)
         {
+            var doctorEntity = _mapper.Map<Doctor>(doctorDto);
+            var validationResult = await _validator.ValidateAsync(doctorEntity);
+
+            if (!validationResult.IsValid)
+            {
+                var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return new ApiErrorResponse("Validation failed", errorMessages);
+            }
+
             var doctor = await _repository.Doctor.GetDoctorAsync(doctorId, trackChanges);
             if (doctor is null)
                 throw new IdNotFoundException<Doctor>(doctorId);
@@ -83,13 +92,6 @@ namespace Service
             return new ApiOkResponse<Guid>(doctorId, "Doctor Updated Successfully");
         }
 
-        public async Task<ApiBaseResponse> CreateTicketAsync(TicketDto ticketDto)
-        {
-            var ticketEntity = _mapper.Map<Ticket>(ticketDto);
-            _repository.Ticket.CreateTicket(ticketEntity);
-            await _repository.SaveAsync();
-            var ticketToReturn = _mapper.Map<TicketDto>(ticketEntity);
-            return new ApiOkResponse<TicketDto>(ticketToReturn, "Ticket created successfully");
-        }
+      
     }
 }
