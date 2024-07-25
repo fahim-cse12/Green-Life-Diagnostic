@@ -10,7 +10,7 @@ namespace Shared.DataTransferObject
 {
     public record DoctorDto : BaseDto
     {
-        public Guid Id { get; init; }
+        public string Id { get; init; }
         public string Name { get; init; }
         public decimal Fee { get; init; }
         public string Speciality { get; init; }

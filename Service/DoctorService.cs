@@ -92,6 +92,6 @@ namespace Service
             return new ApiOkResponse<Guid>(doctorId, "Doctor Updated Successfully");
         }
 
-      
+
     }
 }
