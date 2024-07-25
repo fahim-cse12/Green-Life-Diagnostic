@@ -12,10 +12,7 @@ namespace Entities.Models
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string LoginId { get; set; }
-        [EmailAddress]
-        public string Email { get; set; }
-        public string MobileNo { get; set; }
+
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
     }

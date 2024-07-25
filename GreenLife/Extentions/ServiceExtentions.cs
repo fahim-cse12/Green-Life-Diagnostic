@@ -12,6 +12,9 @@ using GreenLife.Presentation.Controllers;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using Entities.Validators;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace GreenLife.Extentions
 {
@@ -57,7 +60,7 @@ namespace GreenLife.Extentions
             {
                 opt.Conventions.Controller<DoctorController>()
                    .HasApiVersion(new ApiVersion(1, 0));
-              
+
             });
         }
 
@@ -69,11 +72,36 @@ namespace GreenLife.Extentions
                 o.Password.RequireLowercase = false;
                 o.Password.RequireUppercase = false;
                 o.Password.RequireNonAlphanumeric = false;
-                o.Password.RequiredLength = 10;
+                o.Password.RequiredLength = 6;
                 o.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<RepositoryContext>()
             .AddDefaultTokenProviders();
+        }
+
+        public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtSettings = configuration.GetSection("JwtSettings");
+            var secretKey = "GreenLife_2024";
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings["validIssuer"],
+                    ValidAudience = jwtSettings["validAudience"],
+
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                };
+            });
         }
 
         public static void ConfigureSwagger(this IServiceCollection services)
@@ -85,7 +113,7 @@ namespace GreenLife.Extentions
                     Title = "Green Life API",
                     Version = "v1"
                 });
-                
+
             });
         }
 

@@ -1,4 +1,6 @@
-﻿using GreenLife.Presentation.ActionFilter;
+﻿using Entities.Responses;
+using GreenLife.Presentation.ActionFilter;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObject;
@@ -17,15 +19,13 @@ namespace GreenLife.Presentation.Controllers
         public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
         {
             var result = await _service.authenticationService.RegisterUser(userForRegistration);
-            if (!result.Succeeded)
+            if (result is ApiErrorResponse errorResponse)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.TryAddModelError(error.Code, error.Description);
-                }
-                return BadRequest(ModelState);
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
             }
-            return StatusCode(201);
+            var createResponse = (ApiOkResponse<UserForRegistrationDto>)result;
+
+            return Created("User Created", createResponse);
         }
     }
 }

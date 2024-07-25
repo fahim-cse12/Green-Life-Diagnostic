@@ -15,5 +15,6 @@ namespace Shared.DataTransferObject
         public decimal Fee { get; init; }
         public string Speciality { get; init; }
         public string ScheduledDay { get; init; }
+        public string ContactNo { get; init; }
     }
 }

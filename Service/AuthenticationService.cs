@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Entities.ConfigurationModels;
 using Entities.Models;
+using Entities.Responses;
 using LoggerService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -29,13 +30,24 @@ namespace Service
             _jwtConfiguration = _configuration.Value;
         }
 
-        public async Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration)
+        public async Task<ApiBaseResponse> RegisterUser(UserForRegistrationDto userForRegistration)
         {
             var user = _mapper.Map<User>(userForRegistration);
             var result = await _userManager.CreateAsync(user, userForRegistration.Password);
             if (result.Succeeded)
                 await _userManager.AddToRolesAsync(user, userForRegistration.Roles);
-            return result;
+            else
+            {
+                var errorMessages = result.Errors.Select(e => e.Description).ToList();
+                return new ApiErrorResponse("Validation failed", errorMessages);
+            }
+            return new ApiOkResponse<UserForRegistrationDto>(userForRegistration, "User created successfully");
+
+        }
+
+        public Task<bool> ValidateUser(UserForAuthenticationDto userForAuth)
+        {
+            throw new NotImplementedException();
         }
     }
 }
