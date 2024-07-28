@@ -27,5 +27,15 @@ namespace GreenLife.Presentation.Controllers
 
             return Created("User Created", createResponse);
         }
+
+        [HttpPost("login")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
+        {
+            if (!await _service.authenticationService.ValidateUser(user))
+                return Unauthorized();
+            var tokenDto = await _service.authenticationService.CreateToken(populateExp: true);
+            return Ok(tokenDto);
+        }
     }
 }

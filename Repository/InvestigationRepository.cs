@@ -26,12 +26,30 @@ namespace Repository
 
         public async Task<IEnumerable<Investigation>> GetAllInvestigationAsync(bool trackChanges)
         {
-            return await FindAll(trackChanges).OrderBy(i=> i.Id).ToListAsync(); 
-        }
+            try
+            {
+                return await FindAll(trackChanges).Where(i => i.Status == true)
+                                                         .OrderBy(c => c.InvestigationName)
+                                                         .ToListAsync();
+            }
+            catch (Exception ex)
+            {
 
+                throw;
+            }
+
+           
+        }
+        
+                                                         
         public async Task<Investigation> GetInvestigationAsync(Guid investigationId, bool trackChanges)
         {
             return await FindByCondition(x => x.Id.Equals(investigationId), trackChanges).SingleOrDefaultAsync();
+        }
+
+        public void UpdateInvestigation(Investigation investigation)
+        {
+            Update(investigation);
         }
     }
 }

@@ -22,13 +22,14 @@ namespace Service
         private readonly Lazy<IFinancialService> _financialService;
         private readonly Lazy<IUserService> _userService;
         private readonly Lazy<IAuthenticationService> _authenticationService;
-
+        private readonly IOptions<JwtConfiguration> _configuration;
+        private readonly JwtConfiguration _jwtConfiguration;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             ILoggerManager logger,
             IMapper mapper,
             UserManager<User> userManager,
-            IOptions<JwtConfiguration> configuration,
+            IOptions<JwtConfiguration> configuration,            
             IServiceProvider serviceProvider)
         {
             _doctorService = new Lazy<IDoctorService>(() => new DoctorService(
@@ -44,11 +45,21 @@ namespace Service
                 serviceProvider.GetRequiredService<IValidator<Patient>>()));
 
             _patientInvesitgationService = new Lazy<IPatientInvestigationService>(() => new PatientInvestigationService(repositoryManager, logger, mapper));
-            _investigationService = new Lazy<IInvestigationService>(() => new InvestigationService(repositoryManager, logger, mapper));
+            _investigationService = new Lazy<IInvestigationService>(() => new InvestigationService(
+                repositoryManager, 
+                logger,
+                mapper,
+                serviceProvider.GetRequiredService<IValidator<Investigation>>()));
             _ticketService = new Lazy<ITicketService>(() => new TicketService(repositoryManager, logger, mapper));
-            _financialService = new Lazy<IFinancialService>(() => new FinancialRecordService(repositoryManager, logger, mapper));
+            _financialService = new Lazy<IFinancialService>(() => new FinancialRecordService(
+                repositoryManager,
+                logger,
+                mapper,
+                serviceProvider.GetRequiredService<IValidator<FinancialRecord>>()));
             _userService = new Lazy<IUserService>(() => new UserService(repositoryManager, logger, mapper));
             _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration));
+            _configuration = configuration;
+            _jwtConfiguration = _configuration.Value;
         }
 
         public IDoctorService doctorService => _doctorService.Value;

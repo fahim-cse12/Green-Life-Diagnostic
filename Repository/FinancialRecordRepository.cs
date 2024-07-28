@@ -18,15 +18,19 @@ namespace Repository
         {
            Delete(financialRecord); 
         }
-
-        public async Task<IEnumerable<FinancialRecord>> GetAllFinancialRecordAsync(bool trackChanges)
-        {
-            return await FindAll(trackChanges).OrderBy(i=> i.Id).ToListAsync();
-        }
+        public async Task<IEnumerable<FinancialRecord>> GetAllFinancialRecordAsync(bool trackChanges) =>
+                                                       await FindAll(trackChanges).Where(i => i.Status == true)
+                                                       .OrderBy(c => c.CreatedAt)
+                                                       .ToListAsync();
 
         public async Task<FinancialRecord> GetFinancialRecordAsync(Guid financialRecordId, bool trackChanges)
         {
            return await FindByCondition(x=> x.Id.Equals(financialRecordId), trackChanges).SingleOrDefaultAsync();
+        }
+
+        public void UpdateFinancialRecord(FinancialRecord financialRecord)
+        {
+            Update(financialRecord);
         }
     }
 }

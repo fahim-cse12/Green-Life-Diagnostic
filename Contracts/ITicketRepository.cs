@@ -14,5 +14,6 @@ namespace Contracts
         void CreateTicket(Ticket ticket);
         
         void DeleteTicket(Ticket ticket);
+        void UpdateTicket(Ticket ticket);
     }
 }

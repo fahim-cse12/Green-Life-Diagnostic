@@ -33,5 +33,10 @@ namespace Repository
         {
             return await FindByCondition(x => x.Id.Equals(patientInvestigationId), trackChanges).SingleOrDefaultAsync();
         }
+
+        public void UpdatePatientInvestigation(PatientInvestigation patientInvestigation)
+        {
+            Update(patientInvestigation);
+        }
     }
 }

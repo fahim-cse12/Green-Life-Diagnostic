@@ -12,8 +12,8 @@ namespace Service.Contracts
     {
         Task<ApiBaseResponse> GetAllDoctorAsync(bool trackChanges);
         Task<ApiBaseResponse> GetDoctorAsync(Guid doctorId, bool trackChanges);
-        Task<ApiBaseResponse> CreateDoctorAsync(DoctorDto doctorDto);
+        Task<ApiBaseResponse> CreateDoctorAsync(DoctorCreateDto doctorDto);
         Task<ApiBaseResponse> DeleteDoctorAsync(Guid doctorId, bool trackChanges);
-        Task<ApiBaseResponse> UpdateDoctorAsync(Guid doctorId, DoctorDto doctorDto, bool trackChanges);
+        Task<ApiBaseResponse> UpdateDoctorAsync(Guid doctorId, DoctorCreateDto doctorDto, bool trackChanges);
     }
 }

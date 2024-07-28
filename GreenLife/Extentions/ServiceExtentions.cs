@@ -15,6 +15,7 @@ using Entities.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Entities.ConfigurationModels;
 
 namespace GreenLife.Extentions
 {
@@ -81,8 +82,10 @@ namespace GreenLife.Extentions
 
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
-            var secretKey = "GreenLife_2024";
+            var jwtConfiguration = new JwtConfiguration();
+            configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
+
+            var secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -96,13 +99,15 @@ namespace GreenLife.Extentions
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings["validIssuer"],
-                    ValidAudience = jwtSettings["validAudience"],
+                    ValidIssuer = jwtConfiguration.ValidIssuer,
+                    ValidAudience = jwtConfiguration.ValidAudience,
 
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
                 };
             });
         }
+        public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) =>
+                                      services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
 
         public static void ConfigureSwagger(this IServiceCollection services)
         {

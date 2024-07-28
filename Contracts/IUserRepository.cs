@@ -14,5 +14,6 @@ namespace Contracts
         void CreateUSer(User user);
         
         void DeleteUser(User user);
+        void UpdateUser(User user);
     }
 }

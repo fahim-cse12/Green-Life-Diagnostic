@@ -8,7 +8,8 @@ namespace Shared.DataTransferObject
 {
     public class PurchageTicketDto
     {
-        public TicketDto ticketDto {get; set;}
-        public  PatientDto patientDto {get; set;}
+        public PatientCreateDto patientDto { get; set; }
+        public TicketCreateDto ticketDto {get; set;}
+        
     }
 }

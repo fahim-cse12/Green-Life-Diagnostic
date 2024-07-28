@@ -11,5 +11,6 @@ namespace Service.Contracts
     public interface IPatientService
     {
         Task<ApiBaseResponse> PurchageTicketAsync(PurchageTicketDto purchageTicket);
+      //  Task<ApiBaseResponse> PurchageTicketAsync(PurchageTicketDto purchageTicket);
     }
 }

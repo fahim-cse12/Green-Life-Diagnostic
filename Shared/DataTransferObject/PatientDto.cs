@@ -9,7 +9,7 @@ namespace Shared.DataTransferObject
 {
     public record PatientDto : BaseDto
     {
-        public string Id { get; init; }
+        public Guid Id { get; init; }
         public string Name { get; init; }
         public string Gender { get; init; }
         public string Mobile { get; init; }

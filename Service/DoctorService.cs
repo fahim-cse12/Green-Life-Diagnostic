@@ -26,7 +26,7 @@ namespace Service
             _validator = validator; 
         }
 
-        public async Task<ApiBaseResponse> CreateDoctorAsync(DoctorDto doctorDto)
+        public async Task<ApiBaseResponse> CreateDoctorAsync(DoctorCreateDto doctorDto)
         {
             var doctorEntity = _mapper.Map<Doctor>(doctorDto);
             var validationResult = await _validator.ValidateAsync(doctorEntity);
@@ -36,7 +36,8 @@ namespace Service
                 var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 return new ApiErrorResponse("Validation failed", errorMessages);
             }
-
+            doctorEntity.Status = true;
+            doctorEntity.CreatedAt = DateTime.Now;
             _repository.Doctor.CreateDoctor(doctorEntity);
             await _repository.SaveAsync();
 
@@ -68,12 +69,13 @@ namespace Service
             if (doctor is null)
                 return new IdNotFoundResponse<Doctor>(doctorId);
             doctor.Status = false;
+            doctor.UpdatedAt = DateTime.Now;
             _repository.Doctor.UpdateDoctor(doctor);
             await _repository.SaveAsync();
             return new ApiOkResponse<Guid>(doctorId, "Doctor Deleted Successfully");
         }
 
-        public async Task<ApiBaseResponse> UpdateDoctorAsync(Guid doctorId, DoctorDto doctorDto, bool trackChanges)
+        public async Task<ApiBaseResponse> UpdateDoctorAsync(Guid doctorId, DoctorCreateDto doctorDto, bool trackChanges)
         {
             var doctorEntity = _mapper.Map<Doctor>(doctorDto);
             var validationResult = await _validator.ValidateAsync(doctorEntity);
@@ -87,6 +89,7 @@ namespace Service
             var doctor = await _repository.Doctor.GetDoctorAsync(doctorId, trackChanges);
             if (doctor is null)
                 throw new IdNotFoundException<Doctor>(doctorId);
+            doctor.UpdatedAt = DateTime.Now;
             _mapper.Map(doctorDto, doctor);
             await _repository.SaveAsync();
             return new ApiOkResponse<Guid>(doctorId, "Doctor Updated Successfully");

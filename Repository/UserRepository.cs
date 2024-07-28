@@ -33,5 +33,10 @@ namespace Repository
         {
             return await FindByCondition(x => x.Id.Equals(userId), trackChanges).SingleOrDefaultAsync();
         }
+
+        public void UpdateUser(User user)
+        {
+            Update(user);
+        }
     }
 }

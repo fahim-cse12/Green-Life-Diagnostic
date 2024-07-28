@@ -14,5 +14,6 @@ namespace Contracts
         void CreateFinancialRecord(FinancialRecord financialRecord);
         //Task<IEnumerable<FinancialRecord>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges);
         void DeleteFinancialRecord(FinancialRecord financialRecord);
+        void UpdateFinancialRecord(FinancialRecord financialRecord);
     }
 }

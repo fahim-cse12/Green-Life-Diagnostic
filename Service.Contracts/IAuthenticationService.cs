@@ -8,7 +8,7 @@ namespace Service.Contracts
     {
         Task<ApiBaseResponse> RegisterUser(UserForRegistrationDto userForRegistration);
         Task<bool> ValidateUser(UserForAuthenticationDto userForAuth);
-       // Task<TokenDto> CreateToken(bool populateExp);
-        //Task<TokenDto> RefreshToken(TokenDto tokenDto);
+        Task<TokenDto> CreateToken(bool populateExp);
+        Task<TokenDto> RefreshToken(TokenDto tokenDto);
     }
 }

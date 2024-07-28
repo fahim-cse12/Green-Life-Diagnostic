@@ -9,10 +9,10 @@ namespace Shared.DataTransferObject
 {
     public record PatientInvestigationDto : BaseDto
     {
-        public string Id { get; init; }
-        public string PatientId { get; init; }
-        public string DoctorId { get; init; }
-        public string InvestigationId { get; init; }
+        public Guid Id { get; init; }
+        public Guid PatientId { get; init; }
+        public Guid DoctorId { get; init; }
+        public Guid InvestigationId { get; init; }
         public decimal DiscountAmount { get; init; }
         public decimal DueAmount { get; init; }
         public decimal PayAmount { get; init; }

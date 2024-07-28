@@ -13,5 +13,6 @@ namespace Contracts
         Task<Investigation> GetInvestigationAsync(Guid investigationId, bool trackChanges);
         void CreateInvestigation(Investigation investigation);
         void DeleteInvestigation(Investigation investigation);
+        void UpdateInvestigation(Investigation investigation);
     }
 }

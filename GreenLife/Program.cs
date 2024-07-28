@@ -22,12 +22,11 @@ builder.Services.AddControllers(config =>
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddScoped<ValidationFilterAttribute>();
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
 builder.Services.ConfigureLoggerService();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
+builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Services.ConfigureVersioning();
 builder.Services.AddControllers(config =>
 {
@@ -41,6 +40,7 @@ builder.Services.AddControllers(config =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
 builder.Services.ConfigureFluentValidation();
+
 
 var app = builder.Build();
 app.UseSwagger();
