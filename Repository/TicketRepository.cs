@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,6 +23,11 @@ namespace Repository
         public void DeleteTicket(Ticket ticket)
         {
             Delete(ticket); 
+        }
+
+        public async Task<Ticket> FindTicketsByConditionAsync(Expression<Func<Ticket, bool>> condition, bool trackChanges)
+        {
+            return await FindByCondition(condition, trackChanges).SingleOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Ticket>> GetAllTicketAsync(bool trackChanges)

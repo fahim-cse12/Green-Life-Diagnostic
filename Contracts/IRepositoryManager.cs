@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace Contracts
         IFinancialRepository FinancialRecord { get; }
         IUserRepository User { get; }
         Task SaveAsync();
-        Task ExecuteFromSqlRaw(string query, CancellationToken cancellationToken, SqlParameterExpression[] parameters = null);
-        IQueryable<dynamic> GetFromSqlRaw(string query, SqlParameterExpression[] parmeters = null);
+        Task ExecuteFromSqlRaw(string query, CancellationToken cancellationToken, SqlParameter[] parameters = null);
+        IQueryable<T> ExecuteStoredProcedureToGetData<T>(string StoredProcedureName, List<SqlParameter> Parameters = null) where T : class;
         Task BeginTransaction(CancellationToken cancellationToken);
         Task CommitTransaction(CancellationToken cancellationToken);
         Task Rollback(CancellationToken cancellationToken);

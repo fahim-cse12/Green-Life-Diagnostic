@@ -13,6 +13,6 @@ namespace Contracts
         Task<Patient> GetPatientAsync(Guid patientId, bool trackChanges);
         void CreatePatient(Patient patient);
         void DeletePatient(Patient patient);
-        void UpdatePatienc(Patient patient);
+        void UpdatePatient(Patient patient);
     }
 }

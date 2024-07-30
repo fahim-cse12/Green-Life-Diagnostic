@@ -16,7 +16,7 @@ namespace GreenLife.Presentation.Controllers
             _service = service;
         }
 
-        [HttpPost(Name = "PuchageTicket")]
+        [HttpPost(Name = "purchaseticket")]
         public async Task<IActionResult> CreatePatientByTicket([FromBody] PurchageTicketDto purchageTicketDto)
         {
             var response = await _service.patientService.PurchageTicketAsync(purchageTicketDto);
@@ -27,6 +27,30 @@ namespace GreenLife.Presentation.Controllers
             }
 
             return Created("", response);
+        }
+
+        [HttpGet(Name = "patientsearch")]
+        public async Task<IActionResult> PatientSearchByQeuery(string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var response = await _service.patientService.PatientSearchByQuery(patientName, mobileNo, doctorName, startDate, endDate);
+
+            if (response is ApiErrorResponse errorResponse)
+            {
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
+            }
+
+            return Created("", response);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteTicket(Guid id)
+        {
+            var result = await _service.patientService.DeletePurchasedTicketAsync(id, trackChanges: false);
+            if (result is ApiErrorResponse errorResponse)
+            {
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
+            }
+            return Created("", result);
         }
     }
 }

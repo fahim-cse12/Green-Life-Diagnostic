@@ -1,7 +1,9 @@
 ﻿using Entities.Models;
+using Entities.NonDbEntities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Repository.Configuration;
+using System.Reflection;
 
 namespace Repository
 {
@@ -14,7 +16,25 @@ namespace Repository
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
+
+            // mark all non entity types in DBContext
+            foreach (Type type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes())
+            .Where(child => typeof(INonEntityBase).IsAssignableFrom(child) && child.IsClass && !child.IsAbstract))
+            {
+                modelBuilder.Entity(type).HasNoKey().ToView(null);
+            }
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var foreignKey in entityType.GetForeignKeys())
+                {
+                    // Disable cascade delete
+                    foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+
+                }
+            }
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
+     
         public DbSet<Doctor>? Doctors { get; set; }
         public DbSet<FinancialRecord>? FinancialRecords { get; set; }
         public DbSet<Investigation>? Investigations { get; set; }

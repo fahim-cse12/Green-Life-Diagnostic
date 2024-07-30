@@ -1,12 +1,8 @@
 ﻿using Contracts;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Repository
 {
@@ -67,14 +63,23 @@ namespace Repository
             }
         }
 
-        public async Task ExecuteFromSqlRaw(string query, CancellationToken cancellationToken, SqlParameterExpression[] parameters = null)
+        public async Task ExecuteFromSqlRaw(string query, CancellationToken cancellationToken, SqlParameter[] parameters = null)
         {
             await _repositoryContext.Database.ExecuteSqlRawAsync(query, cancellationToken, parameters);
         }
 
-        public IQueryable<dynamic> GetFromSqlRaw(string query, SqlParameterExpression[] parmeters = null)
+        public IQueryable<T> ExecuteStoredProcedureToGetData<T>(string StoredProcedureName, List<SqlParameter> Parameters = null) where T : class
         {
-            return _repositoryContext.Set<dynamic>().FromSqlRaw(query, parmeters);
+            if (Parameters != null && Parameters.Any())
+            {
+                string parameterNames = string.Join(", ", Parameters.Select(x => x.ParameterName).ToArray());
+
+                return _repositoryContext.Set<T>().FromSqlRaw(string.Format("EXEC {0} {1}", StoredProcedureName, parameterNames), Parameters.ToArray());
+            }
+            else
+            {
+                return _repositoryContext.Set<T>().FromSqlRaw(string.Format("EXEC {0}", StoredProcedureName));
+            }
         }
 
         public async Task Rollback(CancellationToken cancellationToken)

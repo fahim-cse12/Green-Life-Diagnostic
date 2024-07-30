@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.Models;
+using Entities.NonDbEntities;
 using Entities.Responses;
 using FluentValidation;
 using LoggerService;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using System.Linq.Expressions;
 
 namespace Service
 {
@@ -84,6 +88,73 @@ namespace Service
                 await _repository.Rollback(cancellationToken);
                 return new ApiErrorResponse("Something Went Wrong", ex.Message);
             }
+        }
+
+        public async Task<ApiBaseResponse> PatientSearchByQuery(string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
+        {
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter("@PatientName", string.IsNullOrEmpty(patientName) ? (object)DBNull.Value : patientName),
+                new SqlParameter("@MobileNumber", string.IsNullOrEmpty(mobileNo) ? (object)DBNull.Value : mobileNo),
+                new SqlParameter("@DoctorName", string.IsNullOrEmpty(doctorName) ? (object)DBNull.Value : doctorName),
+                new SqlParameter("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value),
+                new SqlParameter("@EndDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value)
+            };
+
+            var result = await _repository.ExecuteStoredProcedureToGetData<PatientHistoryDto>("SP_SearchPatient", parameters).ToListAsync();
+
+            if (!result.Any())
+            {
+                return new ApiOkResponse<IEnumerable<PatientHistoryDto>>(null, "Data not found");
+            }
+
+            return new ApiOkResponse<IEnumerable<PatientHistoryDto>>(result, "Patients retrieved successfully");
+        }
+
+        public async Task<ApiBaseResponse> DeletePurchasedTicketAsync(Guid ticketId, bool trackChanges)
+        {
+            var ticket = await _repository.Ticket.GetTicketAsync(ticketId, trackChanges);
+            if (ticket is null)
+                return new IdNotFoundResponse<Ticket>(ticketId);
+            var patient = await _repository.Patient.GetPatientAsync(ticket.PatientId, trackChanges);
+            if (patient is null)
+                return new IdNotFoundResponse<Patient>(ticket.PatientId);
+            var financialRecord = await _repository.FinancialRecord.FindFinancialRecordsByConditionAsync(fr=> fr.RecordDate.Date == ticket.CreatedAt.Date, trackChanges);
+            if (financialRecord is null)
+                return new IdNotFoundResponse<FinancialRecord>(ticketId);
+
+            // Start Transaction
+            CancellationToken cancellationToken = default;
+            await _repository.BeginTransaction(cancellationToken);
+            try
+            {
+                // Update Financial Record
+                financialRecord.Status = false;
+                financialRecord.UpdatedAt = DateTime.Now;
+                _repository.FinancialRecord.UpdateFinancialRecord(financialRecord);
+
+                // Update Patient Record
+                patient.Status = false;
+                patient.UpdatedAt = DateTime.Now;
+                _repository.Patient.UpdatePatient(patient);
+
+                // Update Ticket Record
+                ticket.Status = false;
+                ticket.UpdatedAt = DateTime.Now;
+                _repository.Ticket.UpdateTicket(ticket);
+
+                await _repository.SaveAsync();
+
+                await _repository.CommitTransaction(cancellationToken);
+
+                return new ApiOkResponse<Guid>(ticketId, $"Ticket Deleted for patient {patient.Name}");
+            }
+            catch (Exception ex)
+            {
+                await _repository.BeginTransaction(cancellationToken);
+                throw;
+            }
+          
         }
     }
 }

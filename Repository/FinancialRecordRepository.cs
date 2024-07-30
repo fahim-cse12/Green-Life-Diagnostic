@@ -1,6 +1,7 @@
 ﻿using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Repository
 {
@@ -18,6 +19,12 @@ namespace Repository
         {
            Delete(financialRecord); 
         }
+
+        public async Task<FinancialRecord> FindFinancialRecordsByConditionAsync(Expression<Func<FinancialRecord, bool>> condition, bool trackChanges)
+        {
+            return await FindByCondition(condition, trackChanges).SingleOrDefaultAsync();
+        }
+
         public async Task<IEnumerable<FinancialRecord>> GetAllFinancialRecordAsync(bool trackChanges) =>
                                                        await FindAll(trackChanges).Where(i => i.Status == true)
                                                        .OrderBy(c => c.CreatedAt)
