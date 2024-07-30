@@ -27,7 +27,7 @@ namespace Repository
 
         public async Task<Ticket> FindTicketsByConditionAsync(Expression<Func<Ticket, bool>> condition, bool trackChanges)
         {
-            return await FindByCondition(condition, trackChanges).SingleOrDefaultAsync();
+            return await FindByCondition(condition, trackChanges).OrderByDescending(i=> i.UniqueId).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Ticket>> GetAllTicketAsync(bool trackChanges)

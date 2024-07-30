@@ -9,7 +9,10 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using Shared.Utility;
+using System.Data;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Service
 {
@@ -63,16 +66,17 @@ namespace Service
                 await _repository.SaveAsync();
 
                 ticketEntity.PatientId = patientEntity.Id;
+                ticketEntity.UniqueId = await GenerateUniqueIdAsync();
                 ticketEntity.Status = true;
                 ticketEntity.CreatedAt = DateTime.Now;
 
                 _repository.Ticket.CreateTicket(ticketEntity);
                 await _repository.SaveAsync();
-                var doctor = await _repository.Doctor.GetDoctorAsync(ticketEntity.DoctorId, false);
+
                 var financialRecord = new FinancialRecord
                 {
                     Income = ticketEntity.Amount,
-                    Purpose = $"Ticket purchage for doctor {doctor.Name}",
+                    Purpose = $"Ticket purchage for Ticket or Investigation UniqueId: {ticketEntity.UniqueId}",
                     Status = true,
                     RecordDate = DateTime.Now,
                     CreatedAt = DateTime.Now
@@ -90,8 +94,29 @@ namespace Service
             }
         }
 
+        private async Task<string> GenerateUniqueIdAsync()
+        {
+            var today = DateTime.Now;
+            var datePart = today.ToString("ddMMyy");
+            var lastTicket = await _repository.Ticket.FindTicketsByConditionAsync(t => t.UniqueId.StartsWith(datePart),false);
+
+            int sequenceNumber = 1;
+
+            if (lastTicket != null)
+            {
+                var lastSequenceString = lastTicket.UniqueId.Substring(7);
+                if (int.TryParse(lastSequenceString, out int lastSequence))
+                {
+                    sequenceNumber = lastSequence + 1;
+                }
+            }
+
+            return $"{datePart}T{sequenceNumber:D4}";
+        }
+
         public async Task<ApiBaseResponse> PatientSearchByQuery(string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
         {
+            string sp = DatabaseProcedure.PatientSearchByQuery;
             var parameters = new List<SqlParameter>
             {
                 new SqlParameter("@PatientName", string.IsNullOrEmpty(patientName) ? (object)DBNull.Value : patientName),
@@ -101,7 +126,7 @@ namespace Service
                 new SqlParameter("@EndDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value)
             };
 
-            var result = await _repository.ExecuteStoredProcedureToGetData<PatientHistoryDto>("SP_SearchPatient", parameters).ToListAsync();
+            var result = await _repository.ExecuteStoredProcedureToGetData<PatientHistoryDto>(sp, parameters).ToListAsync();
 
             if (!result.Any())
             {
@@ -113,48 +138,31 @@ namespace Service
 
         public async Task<ApiBaseResponse> DeletePurchasedTicketAsync(Guid ticketId, bool trackChanges)
         {
-            var ticket = await _repository.Ticket.GetTicketAsync(ticketId, trackChanges);
-            if (ticket is null)
-                return new IdNotFoundResponse<Ticket>(ticketId);
-            var patient = await _repository.Patient.GetPatientAsync(ticket.PatientId, trackChanges);
-            if (patient is null)
-                return new IdNotFoundResponse<Patient>(ticket.PatientId);
-            var financialRecord = await _repository.FinancialRecord.FindFinancialRecordsByConditionAsync(fr=> fr.RecordDate.Date == ticket.CreatedAt.Date, trackChanges);
-            if (financialRecord is null)
-                return new IdNotFoundResponse<FinancialRecord>(ticketId);
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter("@TicketId", ticketId),
+                new SqlParameter
+                {
+                    ParameterName = "@ResponseMessage",
+                    SqlDbType = SqlDbType.NVarChar,
+                    Size = 4000,
+                    Direction = ParameterDirection.Output
+                }
+            };
 
-            // Start Transaction
-            CancellationToken cancellationToken = default;
-            await _repository.BeginTransaction(cancellationToken);
             try
             {
-                // Update Financial Record
-                financialRecord.Status = false;
-                financialRecord.UpdatedAt = DateTime.Now;
-                _repository.FinancialRecord.UpdateFinancialRecord(financialRecord);
+                await _repository.ExecuteStoredProcedureAsync("SP_DeletePurchasedTicket", parameters);
 
-                // Update Patient Record
-                patient.Status = false;
-                patient.UpdatedAt = DateTime.Now;
-                _repository.Patient.UpdatePatient(patient);
-
-                // Update Ticket Record
-                ticket.Status = false;
-                ticket.UpdatedAt = DateTime.Now;
-                _repository.Ticket.UpdateTicket(ticket);
-
-                await _repository.SaveAsync();
-
-                await _repository.CommitTransaction(cancellationToken);
-
-                return new ApiOkResponse<Guid>(ticketId, $"Ticket Deleted for patient {patient.Name}");
+                var responseMessage = parameters.Find(p => p.ParameterName == "@ResponseMessage").Value.ToString();
+                return new ApiOkResponse<string>(null, responseMessage);
             }
             catch (Exception ex)
             {
-                await _repository.BeginTransaction(cancellationToken);
-                throw;
+                return new ApiOkResponse<string>(null, ex.Message);
             }
-          
+
         }
+       
     }
 }

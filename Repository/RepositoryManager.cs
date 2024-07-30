@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Text;
 
 namespace Repository
 {
@@ -80,6 +81,19 @@ namespace Repository
             {
                 return _repositoryContext.Set<T>().FromSqlRaw(string.Format("EXEC {0}", StoredProcedureName));
             }
+        }
+
+        public async Task ExecuteStoredProcedureAsync(string storedProcedureName, List<SqlParameter> parameters)
+        {
+            var commandText = new StringBuilder();
+            commandText.Append($"EXEC {storedProcedureName} ");
+
+            if (parameters != null && parameters.Any())
+            {
+                commandText.Append(string.Join(", ", parameters.Select(p => p.ParameterName)));
+            }
+
+            await _repositoryContext.Database.ExecuteSqlRawAsync(commandText.ToString(), parameters.ToArray());
         }
 
         public async Task Rollback(CancellationToken cancellationToken)

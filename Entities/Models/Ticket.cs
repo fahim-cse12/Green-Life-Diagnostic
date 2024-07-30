@@ -15,8 +15,10 @@ namespace Entities.Models
         public Guid PatientId { get; set; }
         [ForeignKey(nameof(Doctor))]
         public Guid DoctorId { get; set; }
+        public string UniqueId { get; set; }
         public decimal Amount { get; set; }
         public decimal Discount { get; set; }
+         
     }
 
 }

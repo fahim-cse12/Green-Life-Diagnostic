@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Shared.DataTransferObject
+﻿namespace Shared.DataTransferObject
 {
     public record PatientInvestigationDto : BaseDto
     {
@@ -13,6 +6,7 @@ namespace Shared.DataTransferObject
         public Guid PatientId { get; init; }
         public Guid DoctorId { get; init; }
         public Guid InvestigationId { get; init; }
+        public string InvestigationUniqueId { get; init; }
         public decimal DiscountAmount { get; init; }
         public decimal DueAmount { get; init; }
         public decimal PayAmount { get; init; }
