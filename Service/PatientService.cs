@@ -11,8 +11,6 @@ using Service.Contracts;
 using Shared.DataTransferObject;
 using Shared.Utility;
 using System.Data;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace Service
 {
@@ -138,30 +136,17 @@ namespace Service
 
         public async Task<ApiBaseResponse> DeletePurchasedTicketAsync(Guid ticketId, bool trackChanges)
         {
-            var parameters = new List<SqlParameter>
+            var parameters = new[]
             {
-                new SqlParameter("@TicketId", ticketId),
-                new SqlParameter
-                {
-                    ParameterName = "@ResponseMessage",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Size = 4000,
-                    Direction = ParameterDirection.Output
-                }
+                 new SqlParameter("@TicketId", SqlDbType.UniqueIdentifier) { Value = ticketId }
             };
-
-            try
+            var result = await _repository.ExecuteSqlRawAsync("SP_DeletePurchasedTicket", parameters);
+            if (result != null)
             {
-                await _repository.ExecuteStoredProcedureAsync("SP_DeletePurchasedTicket", parameters);
-
-                var responseMessage = parameters.Find(p => p.ParameterName == "@ResponseMessage").Value.ToString();
-                return new ApiOkResponse<string>(null, responseMessage);
-            }
-            catch (Exception ex)
-            {
-                return new ApiOkResponse<string>(null, ex.Message);
+                return new ApiOkResponse<string>(null, result);
             }
 
+            return new ApiOkResponse<string>(null, "Ticket has been deleted !");
         }
        
     }

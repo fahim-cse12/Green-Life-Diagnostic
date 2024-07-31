@@ -21,6 +21,7 @@ namespace Contracts
         Task ExecuteFromSqlRaw(string query, CancellationToken cancellationToken, SqlParameter[] parameters = null);
         IQueryable<T> ExecuteStoredProcedureToGetData<T>(string StoredProcedureName, List<SqlParameter> Parameters = null) where T : class;
         Task ExecuteStoredProcedureAsync(string storedProcedureName, List<SqlParameter> parameters);
+        Task<string> ExecuteSqlRawAsync(string storedProcedure, SqlParameter[] parameters);
         Task BeginTransaction(CancellationToken cancellationToken);
         Task CommitTransaction(CancellationToken cancellationToken);
         Task Rollback(CancellationToken cancellationToken);

@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 using System.Text;
 
 namespace Repository
@@ -94,6 +95,29 @@ namespace Repository
             }
 
             await _repositoryContext.Database.ExecuteSqlRawAsync(commandText.ToString(), parameters.ToArray());
+        }
+
+        public async Task<string> ExecuteSqlRawAsync(string storedProcedure, SqlParameter[] parameters)
+        {
+            var outputParameter = new SqlParameter
+            {
+                ParameterName = "@ResponseMessage",
+                SqlDbType = SqlDbType.NVarChar,
+                Size = 4000,
+                Direction = ParameterDirection.Output
+            };
+            parameters = parameters.Append(outputParameter).ToArray();
+
+            var parameterNames = string.Join(", ", parameters.Select(p => p.ParameterName + " = @" + p.ParameterName.TrimStart('@')));
+
+            var commandText = $"EXEC {storedProcedure} {parameterNames}";
+
+            await _repositoryContext.Database.ExecuteSqlRawAsync(commandText, parameters);
+
+            var responseMessage = outputParameter.Value != DBNull.Value ? (string)outputParameter.Value : null;
+            Console.WriteLine($"Stored Procedure Response: {responseMessage}");
+
+            return responseMessage;
         }
 
         public async Task Rollback(CancellationToken cancellationToken)
