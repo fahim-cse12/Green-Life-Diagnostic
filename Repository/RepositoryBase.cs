@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Dapper.SqlMapper;
 
 namespace Repository
 {
@@ -21,6 +22,11 @@ namespace Repository
         public void Create(T entity) => RepositoryContext.Set<T>().Add(entity);
         public void Update(T entity) => RepositoryContext.Set<T>().Update(entity);
         public void Delete(T entity) => RepositoryContext.Set<T>().Remove(entity);
+
+        public void CreateRange(List<T> entities)
+        {
+            RepositoryContext.Set<List<T>>().AddRange(entities);
+        }
 
         //public void Rollback()
         //{
@@ -37,7 +43,7 @@ namespace Repository
         //    return RepositoryContext.Set<T>().FromSqlRaw(query, parmeters);
         //}
 
-       
+
         //public async Task Rollback(CancellationToken cancellationToken)
         //{
         //    await _transaction.RollbackAsync(cancellationToken);

@@ -18,6 +18,10 @@ namespace Repository
         {
             Create(patientInvestigation);
         }
+        public void CreatePatientInvestigationList(List<PatientInvestigation> investigationList)
+        {
+            CreateRange(investigationList);
+        }
 
         public void DeletePatientInvestigation(PatientInvestigation patientInvestigation)
         {

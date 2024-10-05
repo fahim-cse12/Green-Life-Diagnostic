@@ -4,6 +4,7 @@ using Entities.ConfigurationModels;
 using Entities.Models;
 using FluentValidation;
 using LoggerService;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -24,13 +25,15 @@ namespace Service
         private readonly Lazy<IAuthenticationService> _authenticationService;
         private readonly IOptions<JwtConfiguration> _configuration;
         private readonly JwtConfiguration _jwtConfiguration;
+        private readonly IHttpContextAccessor _contextAccessor;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             ILoggerManager logger,
             IMapper mapper,
             UserManager<User> userManager,
             IOptions<JwtConfiguration> configuration,            
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IHttpContextAccessor contextAccessor)
         {
             _doctorService = new Lazy<IDoctorService>(() => new DoctorService(
                 repositoryManager,
@@ -44,7 +47,8 @@ namespace Service
                 mapper,
                 serviceProvider.GetRequiredService<IValidator<Patient>>()));
 
-            _patientInvesitgationService = new Lazy<IPatientInvestigationService>(() => new PatientInvestigationService(repositoryManager, logger, mapper));
+            _patientInvesitgationService = new Lazy<IPatientInvestigationService>(() => new PatientInvestigationService(
+                repositoryManager, logger, mapper, serviceProvider.GetRequiredService<IValidator<PatientInvestigation>>(), contextAccessor));
             _investigationService = new Lazy<IInvestigationService>(() => new InvestigationService(
                 repositoryManager, 
                 logger,

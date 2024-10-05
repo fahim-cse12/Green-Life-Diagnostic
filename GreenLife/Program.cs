@@ -5,6 +5,7 @@ using GreenLife.Presentation.ActionFilter;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi.Models;
 using NLog;
+using Service.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 LogManager.Setup().LoadConfigurationFromFile(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
@@ -41,7 +42,7 @@ builder.Services.AddControllers(config =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
 builder.Services.ConfigureFluentValidation();
-
+builder.Services.AddScoped<IPatientInvestigationService, Service.PatientInvestigationService>();
 
 var app = builder.Build();
 app.UseSwagger();

@@ -55,6 +55,7 @@ namespace GreenLife.Extentions
                                     services.AddScoped<IRepositoryManager, RepositoryManager>();
         public static void ConfigureServiceManager(this IServiceCollection services) =>
                                          services.AddScoped<IServiceManager, ServiceManager>();
+                                       
 
         public static void ConfigureFluentValidation(this IServiceCollection services)
         {

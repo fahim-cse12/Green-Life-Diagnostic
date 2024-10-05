@@ -10,6 +10,7 @@ namespace Entities.NonDbEntities
     {
         public Guid TicketId { get; set; }
         public Guid PatientId { get; set; }
+        public string TicketNo { get; set; }
         public string PatientName { get; set; }
         public int Age { get; set; }
         public int PatientType { get; set; }

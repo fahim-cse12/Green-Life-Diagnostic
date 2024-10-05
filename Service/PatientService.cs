@@ -65,7 +65,7 @@ namespace Service
                 await _repository.SaveAsync();
 
                 ticketEntity.PatientId = patientEntity.Id;
-                ticketEntity.UniqueId = await GenerateUniqueIdAsync();
+                ticketEntity.UniqueId = $"{"TKT"}{DateTime.Now.ToString("ddMMyy")}{DateTime.Now.ToString("ss")}";
                 ticketEntity.Status = true;
                 ticketEntity.CreatedAt = DateTime.Now;
 
@@ -93,31 +93,12 @@ namespace Service
             }
         }
 
-        private async Task<string> GenerateUniqueIdAsync()
-        {
-            var today = DateTime.Now;
-            var datePart = today.ToString("ddMMyy");
-            var lastTicket = await _repository.Ticket.FindTicketsByConditionAsync(t => t.UniqueId.StartsWith(datePart),false);
-
-            int sequenceNumber = 1;
-
-            if (lastTicket != null)
-            {
-                var lastSequenceString = lastTicket.UniqueId.Substring(7);
-                if (int.TryParse(lastSequenceString, out int lastSequence))
-                {
-                    sequenceNumber = lastSequence + 1;
-                }
-            }
-
-            return $"{datePart}T{sequenceNumber:D4}";
-        }
-
-        public async Task<ApiBaseResponse> PatientSearchByQuery(string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<ApiBaseResponse> PatientSearchByQuery(string ticketId, string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
         {
             string sp = DatabaseProcedure.PatientSearchByQuery;
             var parameters = new List<SqlParameter>
             {
+                new SqlParameter("@TicketNo", string.IsNullOrEmpty(ticketId) ? (object)DBNull.Value : ticketId),
                 new SqlParameter("@PatientName", string.IsNullOrEmpty(patientName) ? (object)DBNull.Value : patientName),
                 new SqlParameter("@MobileNumber", string.IsNullOrEmpty(mobileNo) ? (object)DBNull.Value : mobileNo),
                 new SqlParameter("@DoctorName", string.IsNullOrEmpty(doctorName) ? (object)DBNull.Value : doctorName),
