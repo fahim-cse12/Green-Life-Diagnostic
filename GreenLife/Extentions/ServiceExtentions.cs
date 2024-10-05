@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Entities.ConfigurationModels;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace GreenLife.Extentions
 {
@@ -38,6 +40,17 @@ namespace GreenLife.Extentions
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
                                            services.AddDbContext<RepositoryContext>(opts =>
                                            opts.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
+
+        public static void ConfigureIDbConnection(this IServiceCollection services, IConfiguration configuration) =>
+                                           services.AddScoped<IDbConnection>((sp) =>
+                                           {
+                                               var configuration = sp.GetRequiredService<IConfiguration>();
+                                               var connectionString = configuration.GetConnectionString("sqlConnection"); // Ensure you have this in appsettings.json
+                                               return new SqlConnection(connectionString);
+                                           });
+
+
+
         public static void ConfigureRepositoryManager(this IServiceCollection services) =>
                                     services.AddScoped<IRepositoryManager, RepositoryManager>();
         public static void ConfigureServiceManager(this IServiceCollection services) =>

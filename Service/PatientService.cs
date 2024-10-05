@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
+using Dapper;
 using Entities.Models;
 using Entities.NonDbEntities;
 using Entities.Responses;
@@ -136,17 +137,13 @@ namespace Service
 
         public async Task<ApiBaseResponse> DeletePurchasedTicketAsync(Guid ticketId, bool trackChanges)
         {
-            var parameters = new[]
-            {
-                 new SqlParameter("@TicketId", SqlDbType.UniqueIdentifier) { Value = ticketId }
-            };
-            var result = await _repository.ExecuteSqlRawAsync("SP_DeletePurchasedTicket", parameters);
-            if (result != null)
-            {
-                return new ApiOkResponse<string>(null, result);
-            }
+            string sp = DatabaseProcedure.TicketDeleteQuery;
+            var inputParameters = new DynamicParameters();
+            inputParameters.Add("@TicketId", ticketId);
 
-            return new ApiOkResponse<string>(null, "Ticket has been deleted !");
+            var result = await _repository.ExecuteStoreProcedure(sp, inputParameters);
+            
+            return new ApiOkResponse<string>(null, result);
         }
        
     }

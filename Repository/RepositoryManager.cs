@@ -1,6 +1,8 @@
 ﻿using Contracts;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
@@ -19,8 +21,10 @@ namespace Repository
         private readonly Lazy<IFinancialRepository> _financialRepository;
         private readonly Lazy<IUserRepository> _userRepository;
         private IDbContextTransaction _transaction;
+        private readonly IDbConnection _dbConnection;
 
-        public RepositoryManager(RepositoryContext repositoryContext)
+
+        public RepositoryManager(RepositoryContext repositoryContext, IDbConnection dbConnection)
         {
             _repositoryContext = repositoryContext;
             _doctorRepository = new Lazy<IDoctorRepository>(() => new DoctorRepository(repositoryContext));
@@ -30,7 +34,7 @@ namespace Repository
             _investigationRepository = new Lazy<IInvestigationRepository>(() => new InvestigationRepository(repositoryContext));
             _financialRepository = new Lazy<IFinancialRepository>(() => new FinancialRecordRepository(repositoryContext));
             _userRepository = new Lazy<IUserRepository>(() => new UserRepository(repositoryContext));
-
+            _dbConnection = dbConnection;
         }
 
         public IDoctorRepository Doctor => _doctorRepository.Value;
@@ -127,5 +131,12 @@ namespace Repository
         }
 
         public async Task SaveAsync() => await _repositoryContext.SaveChangesAsync();
+
+        public async Task<string> ExecuteStoreProcedure(string spName, DynamicParameters parameters)
+        {
+            var results = await _dbConnection.QueryAsync<string>(spName, parameters, commandType: CommandType.StoredProcedure);
+            return results.FirstOrDefault();
+        }
+
     }
 }
