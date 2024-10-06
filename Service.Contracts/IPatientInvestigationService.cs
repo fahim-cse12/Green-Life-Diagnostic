@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Entities.Responses;
+using Shared.DataTransferObject;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,10 @@ namespace Service.Contracts
 {
     public interface IPatientInvestigationService
     {
+        //Task<ApiBaseResponse> GetAllPtientInvestigationAsync(bool trackChanges);
+        //Task<ApiBaseResponse> GetPatientInvestigationAsync(Guid investigationId, bool trackChanges);
+        Task<ApiBaseResponse> CreatePatientInvestigationAsync(List<PatientInvestigationCreateDto> investigationListDto);
+        //Task<ApiBaseResponse> DeleteInvestigationAsync(Guid investigationId, bool trackChanges);
+        //Task<ApiBaseResponse> UpdateInvestigationAsync(Guid investigationId, InvestigationCreateDto investigationDto, bool trackChanges);
     }
 }

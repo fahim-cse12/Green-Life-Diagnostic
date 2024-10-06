@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
+using Dapper;
 using Entities.Models;
 using Entities.NonDbEntities;
 using Entities.Responses;
@@ -11,8 +12,6 @@ using Service.Contracts;
 using Shared.DataTransferObject;
 using Shared.Utility;
 using System.Data;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace Service
 {
@@ -66,7 +65,7 @@ namespace Service
                 await _repository.SaveAsync();
 
                 ticketEntity.PatientId = patientEntity.Id;
-                ticketEntity.UniqueId = await GenerateUniqueIdAsync();
+                ticketEntity.UniqueId = $"{"TKT"}{DateTime.Now.ToString("ddMMyy")}{DateTime.Now.ToString("ss")}";
                 ticketEntity.Status = true;
                 ticketEntity.CreatedAt = DateTime.Now;
 
@@ -94,31 +93,12 @@ namespace Service
             }
         }
 
-        private async Task<string> GenerateUniqueIdAsync()
-        {
-            var today = DateTime.Now;
-            var datePart = today.ToString("ddMMyy");
-            var lastTicket = await _repository.Ticket.FindTicketsByConditionAsync(t => t.UniqueId.StartsWith(datePart),false);
-
-            int sequenceNumber = 1;
-
-            if (lastTicket != null)
-            {
-                var lastSequenceString = lastTicket.UniqueId.Substring(7);
-                if (int.TryParse(lastSequenceString, out int lastSequence))
-                {
-                    sequenceNumber = lastSequence + 1;
-                }
-            }
-
-            return $"{datePart}T{sequenceNumber:D4}";
-        }
-
-        public async Task<ApiBaseResponse> PatientSearchByQuery(string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<ApiBaseResponse> PatientSearchByQuery(string ticketId, string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
         {
             string sp = DatabaseProcedure.PatientSearchByQuery;
             var parameters = new List<SqlParameter>
             {
+                new SqlParameter("@TicketNo", string.IsNullOrEmpty(ticketId) ? (object)DBNull.Value : ticketId),
                 new SqlParameter("@PatientName", string.IsNullOrEmpty(patientName) ? (object)DBNull.Value : patientName),
                 new SqlParameter("@MobileNumber", string.IsNullOrEmpty(mobileNo) ? (object)DBNull.Value : mobileNo),
                 new SqlParameter("@DoctorName", string.IsNullOrEmpty(doctorName) ? (object)DBNull.Value : doctorName),
@@ -138,30 +118,13 @@ namespace Service
 
         public async Task<ApiBaseResponse> DeletePurchasedTicketAsync(Guid ticketId, bool trackChanges)
         {
-            var parameters = new List<SqlParameter>
-            {
-                new SqlParameter("@TicketId", ticketId),
-                new SqlParameter
-                {
-                    ParameterName = "@ResponseMessage",
-                    SqlDbType = SqlDbType.NVarChar,
-                    Size = 4000,
-                    Direction = ParameterDirection.Output
-                }
-            };
+            string sp = DatabaseProcedure.TicketDeleteQuery;
+            var inputParameters = new DynamicParameters();
+            inputParameters.Add("@TicketId", ticketId);
 
-            try
-            {
-                await _repository.ExecuteStoredProcedureAsync("SP_DeletePurchasedTicket", parameters);
-
-                var responseMessage = parameters.Find(p => p.ParameterName == "@ResponseMessage").Value.ToString();
-                return new ApiOkResponse<string>(null, responseMessage);
-            }
-            catch (Exception ex)
-            {
-                return new ApiOkResponse<string>(null, ex.Message);
-            }
-
+            var result = await _repository.ExecuteStoreProcedure(sp, inputParameters);
+            
+            return new ApiOkResponse<string>(null, result);
         }
        
     }

@@ -5,6 +5,7 @@ using GreenLife.Presentation.ActionFilter;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.OpenApi.Models;
 using NLog;
+using Service.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 LogManager.Setup().LoadConfigurationFromFile(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
@@ -14,6 +15,7 @@ builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
+builder.Services.ConfigureIDbConnection(builder.Configuration);
 builder.Services.AddControllers(config =>
 {
     config.RespectBrowserAcceptHeader = true;

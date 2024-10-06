@@ -1,8 +1,11 @@
 ﻿using Contracts;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 using System.Text;
 
 namespace Repository
@@ -18,8 +21,10 @@ namespace Repository
         private readonly Lazy<IFinancialRepository> _financialRepository;
         private readonly Lazy<IUserRepository> _userRepository;
         private IDbContextTransaction _transaction;
+        private readonly IDbConnection _dbConnection;
 
-        public RepositoryManager(RepositoryContext repositoryContext)
+
+        public RepositoryManager(RepositoryContext repositoryContext, IDbConnection dbConnection)
         {
             _repositoryContext = repositoryContext;
             _doctorRepository = new Lazy<IDoctorRepository>(() => new DoctorRepository(repositoryContext));
@@ -29,7 +34,7 @@ namespace Repository
             _investigationRepository = new Lazy<IInvestigationRepository>(() => new InvestigationRepository(repositoryContext));
             _financialRepository = new Lazy<IFinancialRepository>(() => new FinancialRecordRepository(repositoryContext));
             _userRepository = new Lazy<IUserRepository>(() => new UserRepository(repositoryContext));
-
+            _dbConnection = dbConnection;
         }
 
         public IDoctorRepository Doctor => _doctorRepository.Value;
@@ -96,6 +101,29 @@ namespace Repository
             await _repositoryContext.Database.ExecuteSqlRawAsync(commandText.ToString(), parameters.ToArray());
         }
 
+        public async Task<string> ExecuteSqlRawAsync(string storedProcedure, SqlParameter[] parameters)
+        {
+            var outputParameter = new SqlParameter
+            {
+                ParameterName = "@ResponseMessage",
+                SqlDbType = SqlDbType.NVarChar,
+                Size = 4000,
+                Direction = ParameterDirection.Output
+            };
+            parameters = parameters.Append(outputParameter).ToArray();
+
+            var parameterNames = string.Join(", ", parameters.Select(p => p.ParameterName + " = @" + p.ParameterName.TrimStart('@')));
+
+            var commandText = $"EXEC {storedProcedure} {parameterNames}";
+
+            await _repositoryContext.Database.ExecuteSqlRawAsync(commandText, parameters);
+
+            var responseMessage = outputParameter.Value != DBNull.Value ? (string)outputParameter.Value : null;
+            Console.WriteLine($"Stored Procedure Response: {responseMessage}");
+
+            return responseMessage;
+        }
+
         public async Task Rollback(CancellationToken cancellationToken)
         {
             await _transaction.RollbackAsync(cancellationToken);
@@ -103,5 +131,12 @@ namespace Repository
         }
 
         public async Task SaveAsync() => await _repositoryContext.SaveChangesAsync();
+
+        public async Task<string> ExecuteStoreProcedure(string spName, DynamicParameters parameters)
+        {
+            var results = await _dbConnection.QueryAsync<string>(spName, parameters, commandType: CommandType.StoredProcedure);
+            return results.FirstOrDefault();
+        }
+
     }
 }
