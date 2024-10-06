@@ -5,7 +5,7 @@
         Guid DoctorId,
         Guid InvestigationId,
         string? InvestigationUniqueId, 
-        decimal PayAmount,
+        decimal? PayAmount,
         decimal? DueAmount,
         decimal? DiscountAmount, 
         DateTime? DeliveryDate, 
