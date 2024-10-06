@@ -10,7 +10,7 @@ namespace Service.Contracts
 {
     public interface IPatientInvestigationService
     {
-        //Task<ApiBaseResponse> GetAllPtientInvestigationAsync(bool trackChanges);
+        Task<ApiBaseResponse> GetAllPtientInvestigationAsync(bool trackChanges);
         //Task<ApiBaseResponse> GetPatientInvestigationAsync(Guid investigationId, bool trackChanges);
         Task<ApiBaseResponse> CreatePatientInvestigationAsync(List<PatientInvestigationCreateDto> investigationListDto);
         //Task<ApiBaseResponse> DeleteInvestigationAsync(Guid investigationId, bool trackChanges);

@@ -76,6 +76,11 @@ namespace Service
                 return new ApiErrorResponse("Something Went Wrong", ex.Message);
             }
         }
+
+        public async Task<ApiBaseResponse> GetAllPtientInvestigationAsync(bool trackChanges)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
