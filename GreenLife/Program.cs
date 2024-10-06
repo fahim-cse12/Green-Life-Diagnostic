@@ -42,7 +42,7 @@ builder.Services.AddControllers(config =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
 builder.Services.ConfigureFluentValidation();
-builder.Services.AddScoped<IPatientInvestigationService, Service.PatientInvestigationService>();
+
 
 var app = builder.Build();
 app.UseSwagger();

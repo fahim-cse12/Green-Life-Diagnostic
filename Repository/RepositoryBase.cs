@@ -25,7 +25,7 @@ namespace Repository
 
         public void CreateRange(List<T> entities)
         {
-            RepositoryContext.Set<List<T>>().AddRange(entities);
+            RepositoryContext.Set<T>().AddRange(entities);
         }
 
         //public void Rollback()

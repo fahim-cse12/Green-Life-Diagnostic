@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Service
 {
-    public sealed class PatientInvestigationService : IPatientInvestigationService
+    internal sealed class PatientInvestigationService : IPatientInvestigationService
     {
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
@@ -55,7 +55,8 @@ namespace Service
                         patientInvestigation.InvestigationUniqueId = $"{"INV"}{DateTime.Now.ToString("ddMMyy")}{DateTime.Now.ToString("ss")}";
                         patientInvestigation.Status = true;
                         patientInvestigation.CreatedAt = DateTime.Now;
-                        patientInvestigation.CreatedBy = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                        //patientInvestigation.CreatedBy = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                        patientInvestigation.CreatedBy = null;
                         listData.Add(patientInvestigation);
                     }
                     if (errorMessages.Any())

@@ -13,10 +13,10 @@ namespace GreenLife.Presentation.Controllers
     [ApiExplorerSettings(GroupName = "v1")]
     public class PatientInvestigationController : ApiControllerBase
     {
-        private readonly IPatientInvestigationService _patientInvestigationService;
-        public PatientInvestigationController(IPatientInvestigationService patientInvestigationService) 
+        private readonly IServiceManager _service;
+        public PatientInvestigationController(IServiceManager service) 
         {
-            _patientInvestigationService = patientInvestigationService;
+            _service = service;
 
         } 
 
@@ -24,7 +24,7 @@ namespace GreenLife.Presentation.Controllers
         [HttpPost(Name = "patientinvestigation")]
         public async Task<IActionResult> CreatePatientInvestigation([FromBody] List<PatientInvestigationCreateDto> investigationCreateDtos)
         {
-            var response = await _patientInvestigationService.CreatePatientInvestigationAsync(investigationCreateDtos);
+            var response = await _service.patientInvestigationService.CreatePatientInvestigationAsync(investigationCreateDtos);
 
             if (response is ApiErrorResponse errorResponse)
             {
