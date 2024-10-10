@@ -20,6 +20,7 @@ namespace Repository
         private readonly Lazy<IInvestigationRepository> _investigationRepository;
         private readonly Lazy<IFinancialRepository> _financialRepository;
         private readonly Lazy<IUserRepository> _userRepository;
+        //private readonly Lazy<IInvestigationResultRepository> _investigationResultRepository;
         private IDbContextTransaction _transaction;
         private readonly IDbConnection _dbConnection;
 
@@ -34,6 +35,7 @@ namespace Repository
             _investigationRepository = new Lazy<IInvestigationRepository>(() => new InvestigationRepository(repositoryContext));
             _financialRepository = new Lazy<IFinancialRepository>(() => new FinancialRecordRepository(repositoryContext));
             _userRepository = new Lazy<IUserRepository>(() => new UserRepository(repositoryContext));
+         //   _investigationResultRepository = new Lazy<IInvestigationResultRepository>(() => new InvestigationResultRepository(repositoryContext));
             _dbConnection = dbConnection;
         }
 
@@ -50,6 +52,7 @@ namespace Repository
         public IFinancialRepository FinancialRecord => _financialRepository.Value;
 
         public IUserRepository User => _userRepository.Value;
+      //  public IInvestigationResultRepository InvestigationResultRepository => _investigationResultRepository.Value;
 
         public async Task BeginTransaction(CancellationToken cancellationToken)
         {

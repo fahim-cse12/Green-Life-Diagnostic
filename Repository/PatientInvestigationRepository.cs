@@ -14,10 +14,6 @@ namespace Repository
         public PatientInvestigationRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         { }
 
-        public void CreatePatientInvestigation(PatientInvestigation patientInvestigation)
-        {
-            Create(patientInvestigation);
-        }
         public void CreatePatientInvestigationList(List<PatientInvestigation> investigationList)
         {
             CreateRange(investigationList);
@@ -28,15 +24,15 @@ namespace Repository
            Delete(patientInvestigation);    
         }
 
-        public async Task<IEnumerable<PatientInvestigation>> GetAllPatientInvestigationAsync(bool trackChanges)
-        {
-            return await FindAll(trackChanges).OrderBy(i => i.Id).ToListAsync();
-        }
+        //public async Task<IEnumerable<PatientInvestigation>> GetAllPatientInvestigationAsync(bool trackChanges)
+        //{
+        //    return await FindAll(trackChanges).OrderBy(i => i.Id).ToListAsync();
+        //}
 
-        public async Task<PatientInvestigation> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges)
-        {
-            return await FindByCondition(x => x.Id.Equals(patientInvestigationId), trackChanges).SingleOrDefaultAsync();
-        }
+        //public async Task<PatientInvestigation> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges)
+        //{
+        //    return await FindByCondition(x => x.Id.Equals(patientInvestigationId), trackChanges).SingleOrDefaultAsync();
+        //}
 
         public void UpdatePatientInvestigation(PatientInvestigation patientInvestigation)
         {

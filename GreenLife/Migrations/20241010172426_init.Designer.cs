@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository;
 
@@ -11,9 +12,11 @@ using Repository;
 namespace GreenLife.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    partial class RepositoryContextModelSnapshot : ModelSnapshot
+    [Migration("20241010172426_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -507,37 +510,19 @@ namespace GreenLife.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0fbd7d7a-9c8e-4878-b551-b288fce5d043",
+                            Id = "7d658022-a721-4007-9fd2-695a079eba8e",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "e91712a8-70da-4b7f-b091-6f02134aa362",
+                            Id = "9238dd99-6d96-4b48-8955-e62b8d511c37",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
-                            Id = "265c1633-493b-4b15-8726-e40e211de033",
-                            Name = "Conter",
-                            NormalizedName = "COUNTER"
-                        },
-                        new
-                        {
-                            Id = "8d373bcf-ab1e-4806-bdde-e41ea140294f",
-                            Name = "Administrator",
-                            NormalizedName = "ADMINISTRATOR"
-                        },
-                        new
-                        {
-                            Id = "f89549f6-c695-4f9b-b743-2c7ea0390fac",
-                            Name = "Manager",
-                            NormalizedName = "MANAGER"
-                        },
-                        new
-                        {
-                            Id = "d866b15e-9d36-4571-886c-813e65787702",
+                            Id = "6a784810-7a30-45ce-ba2b-e657b3265e81",
                             Name = "Conter",
                             NormalizedName = "COUNTER"
                         });

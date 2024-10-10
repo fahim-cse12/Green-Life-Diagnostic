@@ -59,6 +59,7 @@ namespace Service
 
             try
             {
+                patientEntity.PatientUniqueId = $"{"PAT"}{DateTime.Now.ToString("ddMMyy")}{DateTime.Now.ToString("ss")}";
                 patientEntity.Status = true;
                 patientEntity.CreatedAt = DateTime.Now;
                 _repository.Patient.CreatePatient(patientEntity);

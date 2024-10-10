@@ -9,11 +9,11 @@ namespace Contracts
 {
     public interface IPatientInvestigationRepository
     {
-        Task<IEnumerable<PatientInvestigation>> GetAllPatientInvestigationAsync(bool trackChanges);
-        Task<PatientInvestigation> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges);
-        void CreatePatientInvestigation(PatientInvestigation patientInvestigation);
+        //Task<IEnumerable<PatientInvestigation>> GetAllPatientInvestigationAsync(bool trackChanges);
+        //Task<PatientInvestigation> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges);
         void CreatePatientInvestigationList(List<PatientInvestigation> investigations);
         void DeletePatientInvestigation(PatientInvestigation investigation);
         void UpdatePatientInvestigation(PatientInvestigation investigation);
+
     }
 }

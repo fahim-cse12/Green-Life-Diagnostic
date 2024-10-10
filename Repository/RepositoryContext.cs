@@ -34,13 +34,14 @@ namespace Repository
             }
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
-     
+
         public DbSet<Doctor>? Doctors { get; set; }
         public DbSet<FinancialRecord>? FinancialRecords { get; set; }
         public DbSet<Investigation>? Investigations { get; set; }
         public DbSet<Patient>? Patients { get; set; }
         public DbSet<PatientInvestigation>? PatientInvestigations { get; set; }
         public DbSet<Ticket>? Tickets { get; set; }
+        public DbSet<PatientInvestigationDetail>? PatientInvestigationDetails { get; set; }
 
     }
 }

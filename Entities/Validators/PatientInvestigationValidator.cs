@@ -12,10 +12,11 @@ namespace Entities.Validators
     {
         public PatientInvestigationValidator()
         {
-            RuleFor(pi => pi.PatientId).NotNull().WithMessage("PatientId is required.");
-            RuleFor(pi => pi.DoctorId).NotNull().WithMessage("DoctorId is required.");
-            RuleFor(pi => pi.InvestigationId).NotNull().WithMessage("InvestigationId is required.");
-            RuleFor(pi => pi.PayAmount).NotEmpty().WithMessage("Pay Amount is required.").GreaterThan(0).WithMessage("Pay Amount must be non-zero.");
+            RuleFor(pi => pi.PatientName).NotNull().WithMessage("Patient Name is required.");
+            RuleFor(pi => pi.PatientAddress).NotNull().WithMessage("Patient Address is required.");
+            RuleFor(pi => pi.PatientAge).NotNull().WithMessage("Patient Age is required.");
+            RuleFor(pi => pi.PatientMobileNo).NotNull().WithMessage("Patient MobileNo is required.");
+            //RuleFor(pi => pi.PaidAmount).NotEmpty().WithMessage("Paid Amount is required.").GreaterThan(0).WithMessage("Pay Amount must be non-zero.");
                                           
         }
     }

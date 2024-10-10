@@ -13,6 +13,7 @@ namespace Entities.Models
     {
         [Column("PatientId")]
         public Guid Id { get; set; }
+        public string PatientUniqueId { get; set; }
         public string Name { get; set; }
         public string Gender { get; set; }
         public string Mobile { get; set; }
