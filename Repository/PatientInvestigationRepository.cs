@@ -14,29 +14,11 @@ namespace Repository
         public PatientInvestigationRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         { }
 
-        public void CreatePatientInvestigationList(List<PatientInvestigation> investigationList)
+        public void CreatePatientInvestigation(PatientInvestigation patientInvestigation)
         {
-            CreateRange(investigationList);
+            Create(patientInvestigation);
         }
 
-        public void DeletePatientInvestigation(PatientInvestigation patientInvestigation)
-        {
-           Delete(patientInvestigation);    
-        }
-
-        //public async Task<IEnumerable<PatientInvestigation>> GetAllPatientInvestigationAsync(bool trackChanges)
-        //{
-        //    return await FindAll(trackChanges).OrderBy(i => i.Id).ToListAsync();
-        //}
-
-        //public async Task<PatientInvestigation> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges)
-        //{
-        //    return await FindByCondition(x => x.Id.Equals(patientInvestigationId), trackChanges).SingleOrDefaultAsync();
-        //}
-
-        public void UpdatePatientInvestigation(PatientInvestigation patientInvestigation)
-        {
-            Update(patientInvestigation);
-        }
+       
     }
 }

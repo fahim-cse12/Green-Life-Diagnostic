@@ -12,7 +12,7 @@ namespace Service.Contracts
     {
         Task<ApiBaseResponse> GetAllPtientInvestigationAsync(bool trackChanges);
         //Task<ApiBaseResponse> GetPatientInvestigationAsync(Guid investigationId, bool trackChanges);
-        //Task<ApiBaseResponse> CreatePatientInvestigationAsync(List<PatientInvestigationCreateDto> investigationListDto);
+        Task<ApiBaseResponse> CreatePatientInvestigationAsync(PatientInvestigationCreateDto patientInvestigationCreateDto);
         //Task<ApiBaseResponse> DeleteInvestigationAsync(Guid investigationId, bool trackChanges);
         //Task<ApiBaseResponse> UpdateInvestigationAsync(Guid investigationId, InvestigationCreateDto investigationDto, bool trackChanges);
       //  Task<ApiBaseResponse> CreateInvestigationResultAsync(List<InvestigationResultCreateDto> investigationListDto);

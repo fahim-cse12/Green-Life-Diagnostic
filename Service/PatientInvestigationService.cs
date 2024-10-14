@@ -15,19 +15,87 @@ namespace Service
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
-      //  private readonly IValidator<InvestigationResult> _investigationResultValidator;
+        private readonly IValidator<PatientInvestigationDetail> _patientInvestigationDetailValidator;
         private readonly IValidator<PatientInvestigation> _patientInvestigationValidator;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public PatientInvestigationService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper,
-         //  IValidator<InvestigationResult> investigationResultValidator,
+           IValidator<PatientInvestigationDetail> patientInvestigationDetailValidator,
            IValidator<PatientInvestigation> patientInvestigationValidator,IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
-          //  _investigationResultValidator = investigationResultValidator;
+            _patientInvestigationDetailValidator = patientInvestigationDetailValidator;
             _patientInvestigationValidator = patientInvestigationValidator;
             _httpContextAccessor = httpContextAccessor;
+        }
+
+        public async Task<ApiBaseResponse> CreatePatientInvestigationAsync(PatientInvestigationCreateDto patientInvestigationCreateDto)
+        {
+            try
+            {
+                var errorMessages = new List<string>();
+                if (patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos.Any())
+                {
+                    var patientInvestigation = _mapper.Map<PatientInvestigation>(patientInvestigationCreateDto);
+                    var validationForInvestigaion = await _patientInvestigationValidator.ValidateAsync(patientInvestigation);
+                    if (!validationForInvestigaion.IsValid)
+                    {
+                        errorMessages.AddRange(validationForInvestigaion.Errors.Select(e => e.ErrorMessage));
+                    }
+
+                    if (errorMessages.Any())
+                    {
+                        return new ApiErrorResponse("Validation failed", errorMessages);
+                    }
+                    _repository.PatientInvestigation.CreatePatientInvestigation(patientInvestigation);
+
+                    await _repository.SaveAsync();
+
+                    List<PatientInvestigationDetail> detialsList = new List<PatientInvestigationDetail>();
+
+                    foreach (var item in patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos)
+                    {
+                        var patientInvestigationDetails = _mapper.Map<PatientInvestigationDetail>(patientInvestigationCreateDto);
+                        var validationForInvestigaionDetails = await _patientInvestigationDetailValidator.ValidateAsync(patientInvestigationDetails);
+                        if (!validationForInvestigaionDetails.IsValid)
+                        {
+                            errorMessages.AddRange(validationForInvestigaionDetails.Errors.Select(e => e.ErrorMessage));
+                        }
+
+                        if (errorMessages.Any())
+                        {
+                            return new ApiErrorResponse("Validation failed", errorMessages);
+                        }
+                        patientInvestigationDetails.PatientInvestigationId = patientInvestigation.PatientInvestigationId;
+                        patientInvestigationDetails.CreatedAt = DateTime.Now;
+                        patientInvestigationDetails.UpdatedAt = DateTime.Now;
+                        patientInvestigationDetails.IsDelivered = false;
+
+                        detialsList.Add(patientInvestigationDetails);
+
+                    }
+
+                    _repository.InvestigationDetailsRepository.CreatePatientInvestigationDetails(detialsList);
+
+                    await _repository.SaveAsync();
+                    patientInvestigation.InvestigationDetails = detialsList;
+
+                    var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+
+                    return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, $"Patient Investigation Created Successfully");
+
+                }
+                else
+                {
+                    errorMessages.Add($"At least one investigation should be add");
+                    return new ApiErrorResponse("Validation failed", errorMessages);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiErrorResponse("Something Went Wrong", ex.Message);
+            }
         }
 
         //public async Task<ApiBaseResponse> CreateInvestigationResultAsync(List<InvestigationResultCreateDto> investigationResultListDto)
@@ -55,11 +123,11 @@ namespace Service
 
         //                listData.Add(investigationResult);
         //            }
-                   
+
         //            _repository.InvestigationResultRepository.CreateInvestigationResult(listData);
 
         //            await _repository.SaveAsync();
-                   
+
         //            return new ApiOkResponse<string>(listData[0].ResultDate.ToString(), $"Investigation Result Created Successfully");
         //        }
 

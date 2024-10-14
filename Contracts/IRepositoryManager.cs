@@ -9,7 +9,7 @@ namespace Contracts
         IDoctorRepository Doctor { get; }
         IPatientRepository Patient { get; }
         IPatientInvestigationRepository PatientInvestigation { get; }
-      //  IInvestigationResultRepository InvestigationResultRepository { get; }
+        IPatientInvestigationDetailRepository InvestigationDetailsRepository { get; }
         ITicketRepository Ticket { get; } 
         IInvestigationRepository Investigation { get; }
         IFinancialRepository FinancialRecord { get; }

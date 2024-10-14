@@ -13,7 +13,8 @@
         decimal? DueAmount,
         decimal? DiscountAmount, 
         DateTime? DeliveryDate, 
-        bool IsDelivered
+        bool IsDelivered,
+        List<PatientInvestigationDetailCreateDto> PatientInvestigationDetailCreateDtos
     );
     
 }

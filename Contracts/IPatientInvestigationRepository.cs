@@ -11,9 +11,10 @@ namespace Contracts
     {
         //Task<IEnumerable<PatientInvestigation>> GetAllPatientInvestigationAsync(bool trackChanges);
         //Task<PatientInvestigation> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges);
-        void CreatePatientInvestigationList(List<PatientInvestigation> investigations);
-        void DeletePatientInvestigation(PatientInvestigation investigation);
-        void UpdatePatientInvestigation(PatientInvestigation investigation);
+        void CreatePatientInvestigation(PatientInvestigation patientInvestigation);
+
+        //void DeletePatientInvestigation(PatientInvestigation investigation);
+        //void UpdatePatientInvestigation(PatientInvestigation investigation);
 
     }
 }
