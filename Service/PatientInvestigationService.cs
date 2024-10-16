@@ -7,6 +7,7 @@ using LoggerService;
 using Microsoft.AspNetCore.Http;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using System.Threading;
 
 namespace Service
 {
@@ -32,71 +33,141 @@ namespace Service
 
         public async Task<ApiBaseResponse> CreatePatientInvestigationAsync(PatientInvestigationCreateDto patientInvestigationCreateDto)
         {
+
+            CancellationToken cancellationToken = default;
             try
             {
-                var errorMessages = new List<string>();
-                if (patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos.Any())
+                if (!patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos.Any())
                 {
-                    var patientInvestigation = _mapper.Map<PatientInvestigation>(patientInvestigationCreateDto);
-                    var validationForInvestigaion = await _patientInvestigationValidator.ValidateAsync(patientInvestigation);
-                    if (!validationForInvestigaion.IsValid)
-                    {
-                        errorMessages.AddRange(validationForInvestigaion.Errors.Select(e => e.ErrorMessage));
-                    }
-
-                    if (errorMessages.Any())
-                    {
-                        return new ApiErrorResponse("Validation failed", errorMessages);
-                    }
-                    _repository.PatientInvestigation.CreatePatientInvestigation(patientInvestigation);
-
-                    await _repository.SaveAsync();
-
-                    List<PatientInvestigationDetail> detialsList = new List<PatientInvestigationDetail>();
-
-                    foreach (var item in patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos)
-                    {
-                        var patientInvestigationDetails = _mapper.Map<PatientInvestigationDetail>(patientInvestigationCreateDto);
-                        var validationForInvestigaionDetails = await _patientInvestigationDetailValidator.ValidateAsync(patientInvestigationDetails);
-                        if (!validationForInvestigaionDetails.IsValid)
-                        {
-                            errorMessages.AddRange(validationForInvestigaionDetails.Errors.Select(e => e.ErrorMessage));
-                        }
-
-                        if (errorMessages.Any())
-                        {
-                            return new ApiErrorResponse("Validation failed", errorMessages);
-                        }
-                        patientInvestigationDetails.PatientInvestigationId = patientInvestigation.PatientInvestigationId;
-                        patientInvestigationDetails.CreatedAt = DateTime.Now;
-                        patientInvestigationDetails.UpdatedAt = DateTime.Now;
-                        patientInvestigationDetails.IsDelivered = false;
-
-                        detialsList.Add(patientInvestigationDetails);
-
-                    }
-
-                    _repository.InvestigationDetailsRepository.CreatePatientInvestigationDetails(detialsList);
-
-                    await _repository.SaveAsync();
-                    patientInvestigation.InvestigationDetails = detialsList;
-
-                    var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
-
-                    return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, $"Patient Investigation Created Successfully");
-
+                    return new ApiErrorResponse("Validation failed", new List<string> { "At least one investigation should be added" });
                 }
-                else
+
+                // Map and validate the PatientInvestigation
+                var patientInvestigation = _mapper.Map<PatientInvestigation>(patientInvestigationCreateDto);
+                var investigationValidationResult = await _patientInvestigationValidator.ValidateAsync(patientInvestigation);
+
+                if (!investigationValidationResult.IsValid)
                 {
-                    errorMessages.Add($"At least one investigation should be add");
-                    return new ApiErrorResponse("Validation failed", errorMessages);
+                    return new ApiErrorResponse("Validation failed", investigationValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
                 }
+
+                // Save the patientInvestigation first to generate the PatientInvestigationId
+                patientInvestigation.PatientInvestigationUniqueId = $"{"INV"}{DateTime.Now.ToString("ddMMyy")}{DateTime.Now.ToString("ss")}";
+                patientInvestigation.CreatedAt = DateTime.Now;
+                patientInvestigation.UpdatedAt = DateTime.Now;
+
+                await _repository.BeginTransaction(cancellationToken);
+
+                _repository.PatientInvestigation.CreatePatientInvestigation(patientInvestigation);
+                await _repository.SaveAsync();  // This ensures PatientInvestigationId is generated
+
+                // Now map and validate PatientInvestigationDetails
+                var patientInvestigationDetailsList = new List<PatientInvestigationDetail>();
+                foreach (var detailDto in patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos)
+                {
+                    var patientInvestigationDetail = _mapper.Map<PatientInvestigationDetail>(detailDto);
+                    var detailValidationResult = await _patientInvestigationDetailValidator.ValidateAsync(patientInvestigationDetail);
+
+                    if (!detailValidationResult.IsValid)
+                    {
+                        return new ApiErrorResponse("Validation failed", detailValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
+                    }
+
+                    // Assign the generated PatientInvestigationId
+                    patientInvestigationDetail.PatientInvestigationId = patientInvestigation.PatientInvestigationId;
+                    patientInvestigationDetail.CreatedAt = DateTime.Now;
+                    patientInvestigationDetail.UpdatedAt = DateTime.Now;
+                    patientInvestigationDetail.IsDelivered = false;
+
+                    patientInvestigationDetailsList.Add(patientInvestigationDetail);
+                }
+
+                // Save the details
+                _repository.InvestigationDetailsRepository.CreatePatientInvestigationDetails(patientInvestigationDetailsList);
+                await _repository.SaveAsync();
+
+                await _repository.CommitTransaction(cancellationToken);
+                // Return the result
+                patientInvestigation.InvestigationDetails = patientInvestigationDetailsList;
+                var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+                return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, "Patient Investigation Created Successfully");
             }
             catch (Exception ex)
             {
+                await _repository.Rollback(cancellationToken);
                 return new ApiErrorResponse("Something Went Wrong", ex.Message);
             }
         }
+
+
+
+        //public async Task<ApiBaseResponse> CreatePatientInvestigationAsync(PatientInvestigationCreateDto patientInvestigationCreateDto)
+        //{
+        //    try
+        //    {
+        //        var errorMessages = new List<string>();
+        //        if (patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos.Any())
+        //        {
+        //            var patientInvestigation = _mapper.Map<PatientInvestigation>(patientInvestigationCreateDto);
+        //            var validationForInvestigaion = await _patientInvestigationValidator.ValidateAsync(patientInvestigation);
+        //            if (!validationForInvestigaion.IsValid)
+        //            {
+        //                errorMessages.AddRange(validationForInvestigaion.Errors.Select(e => e.ErrorMessage));
+        //            }
+
+        //            if (errorMessages.Any())
+        //            {
+        //                return new ApiErrorResponse("Validation failed", errorMessages);
+        //            }
+        //            _repository.PatientInvestigation.CreatePatientInvestigation(patientInvestigation);
+
+        //            await _repository.SaveAsync();
+
+        //            List<PatientInvestigationDetail> detialsList = new List<PatientInvestigationDetail>();
+
+        //            foreach (var item in patientInvestigationCreateDto.PatientInvestigationDetailCreateDtos)
+        //            {
+        //                var patientInvestigationDetails = _mapper.Map<PatientInvestigationDetail>(patientInvestigationCreateDto);
+        //                var validationForInvestigaionDetails = await _patientInvestigationDetailValidator.ValidateAsync(patientInvestigationDetails);
+        //                if (!validationForInvestigaionDetails.IsValid)
+        //                {
+        //                    errorMessages.AddRange(validationForInvestigaionDetails.Errors.Select(e => e.ErrorMessage));
+        //                }
+
+        //                if (errorMessages.Any())
+        //                {
+        //                    return new ApiErrorResponse("Validation failed", errorMessages);
+        //                }
+        //                patientInvestigationDetails.PatientInvestigationId = patientInvestigation.PatientInvestigationId;
+        //                patientInvestigationDetails.CreatedAt = DateTime.Now;
+        //                patientInvestigationDetails.UpdatedAt = DateTime.Now;
+        //                patientInvestigationDetails.IsDelivered = false;
+
+        //                detialsList.Add(patientInvestigationDetails);
+
+        //            }
+
+        //            _repository.InvestigationDetailsRepository.CreatePatientInvestigationDetails(detialsList);
+
+        //            await _repository.SaveAsync();
+        //            patientInvestigation.InvestigationDetails = detialsList;
+
+        //            var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+
+        //            return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, $"Patient Investigation Created Successfully");
+
+        //        }
+        //        else
+        //        {
+        //            errorMessages.Add($"At least one investigation should be add");
+        //            return new ApiErrorResponse("Validation failed", errorMessages);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new ApiErrorResponse("Something Went Wrong", ex.Message);
+        //    }
+        //}
 
         //public async Task<ApiBaseResponse> CreateInvestigationResultAsync(List<InvestigationResultCreateDto> investigationResultListDto)
         //{

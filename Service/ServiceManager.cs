@@ -48,7 +48,8 @@ namespace Service
                 serviceProvider.GetRequiredService<IValidator<Patient>>()));
 
             _patientInvesitgationService = new Lazy<IPatientInvestigationService>(() => new PatientInvestigationService(
-                repositoryManager, logger, mapper, serviceProvider.GetRequiredService<IValidator<PatientInvestigation>>(), 
+                repositoryManager, logger, mapper, serviceProvider.GetRequiredService<IValidator<PatientInvestigationDetail>>(),
+                serviceProvider.GetRequiredService<IValidator<PatientInvestigation>>(), 
                 contextAccessor));
             _investigationService = new Lazy<IInvestigationService>(() => new InvestigationService(
                 repositoryManager, 

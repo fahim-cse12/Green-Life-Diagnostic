@@ -18,18 +18,18 @@ namespace GreenLife.Presentation.Controllers
         }
 
 
-        //[HttpPost("investigaioncreate", Name = "CreatePatientInvestigation")]
-        //public async Task<IActionResult> CreatePatientInvestigation([FromBody] List<PatientInvestigationCreateDto> investigationCreateDtos)
-        //{
-        //    var response = await _service.patientInvestigationService.CreatePatientInvestigationAsync(investigationCreateDtos);
+        [HttpPost("investigaioncreate", Name = "CreatePatientInvestigation")]
+        public async Task<IActionResult> CreatePatientInvestigation([FromBody] PatientInvestigationCreateDto investigationCreateDtos)
+        {
+            var response = await _service.patientInvestigationService.CreatePatientInvestigationAsync(investigationCreateDtos);
 
-        //    if (response is ApiErrorResponse errorResponse)
-        //    {
-        //        return BadRequest(new { errorResponse.Message, errorResponse.Errors });
-        //    }
+            if (response is ApiErrorResponse errorResponse)
+            {
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
+            }
 
-        //    return Created("", response);
-        //}
+            return Created("", response);
+        }
 
 
         //[HttpPost("investigaionresultcreate", Name = "CreateInvestigationResult")]

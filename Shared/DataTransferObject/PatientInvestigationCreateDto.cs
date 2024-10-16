@@ -3,7 +3,6 @@
     public record PatientInvestigationCreateDto(
         string? PatientUniqueId,
         Guid? DoctorId,
-        Guid InvestigationId,
         string? InvestigationUniqueId, 
         string PatientName,
         int PatientAge,
@@ -12,7 +11,7 @@
         decimal? PaidAmount,
         decimal? DueAmount,
         decimal? DiscountAmount, 
-        DateTime? DeliveryDate, 
+        string? DeliveryDate, 
         bool IsDelivered,
         List<PatientInvestigationDetailCreateDto> PatientInvestigationDetailCreateDtos
     );

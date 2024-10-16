@@ -12,8 +12,6 @@ namespace Shared.DataTransferObject
         string? ResultText,
         DateTime? ResultDate,
         decimal? PaidAmount,
-        bool IsDelivered,
-        DateTime CreatedAt,
-        DateTime UpdatedAt
+        bool IsDelivered
     );
 }
