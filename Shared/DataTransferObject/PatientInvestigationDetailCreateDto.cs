@@ -9,9 +9,6 @@ namespace Shared.DataTransferObject
     public record PatientInvestigationDetailCreateDto
     (
         Guid InvestigationId,
-        string? ResultText,
-        DateTime? ResultDate,
-        decimal? PaidAmount,
-        bool IsDelivered
+        decimal PaymentAmount
     );
 }

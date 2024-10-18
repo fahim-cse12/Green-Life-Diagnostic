@@ -18,7 +18,7 @@ namespace Entities.Models
         public Guid InvestigationId { get; set; } // Foreign key to Investigation table
         public string? ResultText { get; set; } // Result for each test
         public DateTime? ResultDate { get; set; } // Date when result was created
-        public decimal PaidAmount { get; set; }
+        public decimal PaymentAmount { get; set; }
         public bool IsDelivered { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

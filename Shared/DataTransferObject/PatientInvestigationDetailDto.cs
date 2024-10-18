@@ -12,8 +12,10 @@ namespace Shared.DataTransferObject
         Guid InvestigationId,
         string? ResultText,
         DateTime? ResultDate,
-        decimal? PaidAmount,
-        bool IsDelivered
+        decimal PaymentAmount,
+        bool IsDelivered,
+        string CreatedAt,
+        string UpdatedAt
     );
    
 }

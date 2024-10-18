@@ -10,5 +10,6 @@ namespace Contracts
     public interface IPatientInvestigationDetailRepository
     {
         void CreatePatientInvestigationDetails(List<PatientInvestigationDetail> patientInvestigationDetails);
+     
     }
 }

@@ -19,6 +19,9 @@ namespace Repository
             Create(patientInvestigation);
         }
 
-       
+        public IQueryable<PatientInvestigation> GetAllInvestigations(bool trackChanges)
+        {
+            return FindAll(trackChanges);
+        }
     }
 }

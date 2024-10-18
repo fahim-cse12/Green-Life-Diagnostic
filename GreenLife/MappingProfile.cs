@@ -17,9 +17,8 @@ namespace GreenLife
             CreateMap<PatientInvestigationCreateDto, PatientInvestigation>().ReverseMap();
             CreateMap<PatientInvestigationDetailCreateDto, PatientInvestigationDetail>()
            .ForMember(dest => dest.PatientInvestigationDetailId, opt => opt.Ignore()) // Ignoring auto-generated fields
-           .ForMember(dest => dest.PatientInvestigationId, opt => opt.Ignore()) // Ignoring if this is set elsewhere
-           .ForMember(dest => dest.CreatedAt, opt => opt.Ignore()) // Ignoring CreatedAt as it may be auto-generated
-           .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore()); // Ignoring UpdatedAt as it may be auto-generated
+           .ForMember(dest => dest.PatientInvestigationId, opt => opt.Ignore());// Ignoring if this is set elsewhere
+          
             CreateMap<PatientInvestigationDetailDto, PatientInvestigationDetail>().ReverseMap();
             CreateMap<InvestigationDto, Investigation>().ReverseMap();
             CreateMap<InvestigationCreateDto, Investigation>().ReverseMap();

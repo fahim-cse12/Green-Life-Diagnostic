@@ -11,7 +11,7 @@ namespace GreenLife.Presentation.Controllers
     public class PatientInvestigationController : ApiControllerBase
     {
         private readonly IServiceManager _service;
-        public PatientInvestigationController(IServiceManager service) 
+        public PatientInvestigationController(IServiceManager service)
         {
             _service = service;
 
@@ -31,6 +31,27 @@ namespace GreenLife.Presentation.Controllers
             return Created("", response);
         }
 
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetFilteredPatientInvestigations(
+       [FromQuery] string? patientInvestigationUniqueId,
+       [FromQuery] string? patientUniqueId,
+       [FromQuery] string? patientName,
+       [FromQuery] string? patientMobileNo,
+       [FromQuery] DateTime? fromDate,
+       [FromQuery] DateTime? toDate)
+        {
+            // Call service method and pass the query parameters
+            var response = await _service.patientInvestigationService.GetFilteredPatientInvestigationsAsync(
+                patientInvestigationUniqueId, patientUniqueId, patientName, patientMobileNo, fromDate, toDate, 1, 10, false);
+
+            // If it's an error response, return appropriate error status
+            if (response is ApiErrorResponse errorResponse)
+            {
+                return StatusCode(500, errorResponse);
+            }
+
+            return Ok(response);
+        }
 
         //[HttpPost("investigaionresultcreate", Name = "CreateInvestigationResult")]
         //public async Task<IActionResult> CreateInvestigationResult([FromBody] List<InvestigationResultCreateDto> investigationResultCreateDtos)

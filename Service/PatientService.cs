@@ -59,14 +59,14 @@ namespace Service
 
             try
             {
-                patientEntity.PatientUniqueId = $"{"PAT"}{DateTime.Now.ToString("ddMMyy")}{DateTime.Now.ToString("ss")}";
+                patientEntity.PatientUniqueId = $"PAT{DateTime.Now:ddMMyyHHmmss}";
                 patientEntity.Status = true;
                 patientEntity.CreatedAt = DateTime.Now;
                 _repository.Patient.CreatePatient(patientEntity);
                 await _repository.SaveAsync();
 
                 ticketEntity.PatientId = patientEntity.Id;
-                ticketEntity.UniqueId = $"{"TKT"}{DateTime.Now.ToString("ddMMyy")}{DateTime.Now.ToString("ss")}";
+                ticketEntity.UniqueId = $"TKT{DateTime.Now:ddMMyyHHmmss}";
                 ticketEntity.Status = true;
                 ticketEntity.CreatedAt = DateTime.Now;
 
