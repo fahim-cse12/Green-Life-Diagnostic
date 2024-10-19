@@ -80,6 +80,7 @@ namespace Service
                     detail.CreatedAt = currentDate;
                     detail.UpdatedAt = currentDate;
                     detail.IsDelivered = false;
+                    detail.IsActive = true;
 
                     // Validate each detail
                     var detailValidationResult = await _patientInvestigationDetailValidator.ValidateAsync(detail);
@@ -105,6 +106,21 @@ namespace Service
                 await _repository.Rollback(cancellationToken);
                 return new ApiErrorResponse("Something Went Wrong", ex.Message);
             }
+        }
+
+        public async Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid detailId)
+        {
+            var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detailId, false);
+            if (result == null)
+            {
+                return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
+            }
+            result.IsActive = false;
+            result.UpdatedAt = DateTime.Now;
+            _repository.InvestigationDetailsRepository.UpdateSinglePatientInvestigationDetails(result);
+            await _repository.SaveAsync();
+
+            return new ApiOkResponse<Guid>(detailId, "Patient Investigation Detail Deleted Successfully");
         }
 
         public async Task<ApiBaseResponse> GetFilteredPatientInvestigationsAsync(string? patientInvestigationUniqueId, string? patientUniqueId, 
@@ -152,6 +168,7 @@ namespace Service
                 // Apply pagination using Skip and Take
                 var patientInvestigations = await query
                     .Include(pi => pi.InvestigationDetails)
+                    .ThenInclude(detail => detail.Investigation)
                     .Skip((pageNumber - 1) * pageSize) // Skip the previous pages
                     .Take(pageSize) // Take only the page size number of records
                     .ToListAsync();
@@ -164,8 +181,7 @@ namespace Service
                     patientInvestigationDtos,
                     pageNumber,
                     pageSize,
-                    totalRecords,
-                    "Filtered results retrieved successfully"
+                    totalRecords
                 );
 
                 return new ApiOkResponse<PagedResponse<List<PatientInvestigationDto>>>(pagedResponse);
@@ -175,19 +191,121 @@ namespace Service
                 return new ApiErrorResponse("An error occurred while retrieving patient investigations", ex.Message);
             }
         }
+
+        public async Task<ApiBaseResponse> UpdatePatientInvestigationAsync(PatientInvestigationDto patientInvestigationDto)
+        {
+            CancellationToken cancellationToken = default;
+            var currentDate = DateTime.Now;
+
+            if (!patientInvestigationDto.InvestigationDetails.Any())
+            {
+                return new ApiErrorResponse("Validation failed", new List<string> { "At least one investigation should be added" });
+            }
+
+            // Fetch existing patient investigation
+            var patientInvestigation = await _repository.PatientInvestigation.GetPatientInvestigationById(patientInvestigationDto.PatientInvestigationId, false);
+            if (patientInvestigation == null)
+            {
+                return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
+            }
+
+            // Map the updated PatientInvestigation from DTO
+            _mapper.Map(patientInvestigationDto, patientInvestigation);
+            patientInvestigation.UpdatedAt = currentDate;
+
+            // Map Investigation Details (add or update based on the PatientInvestigationId)
+            var detailList = _mapper.Map<List<PatientInvestigationDetail>>(patientInvestigationDto.InvestigationDetails);
+
+            // To handle changes in investigation details, we need to decide if the existing details should be updated or removed
+            var existingDetails = await _repository.InvestigationDetailsRepository.GetInvestigationDetailByPatientInvestigationId(patientInvestigation.PatientInvestigationId, false);
+
+            foreach (var detail in existingDetails)
+            {
+                // Check if each existing detail is still in the updated list, otherwise mark for deletion or change status
+                var updatedDetail = detailList.FirstOrDefault(d => d.InvestigationId == detail.InvestigationId);
+                if (updatedDetail != null)
+                {
+                    // Update existing detail
+                    _mapper.Map(updatedDetail, detail);
+                }
+                else
+                {
+                   var isDelete = await DeletePatientInvestigationDetail(updatedDetail.PatientInvestigationDetailId);
+                    if(isDelete)
+                        return new IdNotFoundResponse<PatientInvestigationDetail>(updatedDetail.PatientInvestigationDetailId);
+                }
+            }
+
+            //// Add new details (if any)
+            foreach (var newDetail in detailList.Where(d => !existingDetails.Any(ed => ed.InvestigationId == d.InvestigationId)))
+            {
+                newDetail.PatientInvestigationId = patientInvestigation.PatientInvestigationId;
+                newDetail.CreatedAt = currentDate;
+                newDetail.UpdatedAt = currentDate;
+                existingDetails.Add(newDetail);
+            }
+
+            // Recalculate financials based on the updated details
+            patientInvestigation.CalculateFinancials(patientInvestigation.DiscountAmount);
+            patientInvestigation.UpdateDueAmount();
+
+            // Validate PatientInvestigation and Details
+            var investigationValidationResult = await _patientInvestigationValidator.ValidateAsync(patientInvestigation);
+            if (!investigationValidationResult.IsValid)
+            {
+                return new ApiErrorResponse("Validation failed", investigationValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
+            }
+
+            foreach (var detail in detailList)
+            {
+                var detailValidationResult = await _patientInvestigationDetailValidator.ValidateAsync(detail);
+                if (!detailValidationResult.IsValid)
+                {
+                    return new ApiErrorResponse("Validation failed", detailValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
+                }
+            }
+
+            // Save changes in a transaction
+            await _repository.BeginTransaction(cancellationToken);
+
+            try
+            {
+                // Update PatientInvestigation in the repository
+                _repository.PatientInvestigation.UpdatePatientInvestigation(patientInvestigation);
+                await _repository.SaveAsync();
+
+                // Update Investigation Details in the repository
+               _repository.InvestigationDetailsRepository.UpdatePatientInvestigationDetails(existingDetails);
+                await _repository.SaveAsync();
+
+                // Commit transaction
+                await _repository.CommitTransaction(cancellationToken);
+
+                // Map to DTO and return success response
+                var patientInvestigationDtoResult = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+                return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDtoResult, "Patient Investigation Updated Successfully");
+            }
+            catch (Exception ex)
+            {
+                await _repository.Rollback(cancellationToken);
+                return new ApiErrorResponse("Something Went Wrong", ex.Message);
+            }
+        }
+
+        private async Task<bool> DeletePatientInvestigationDetail(Guid detialId)
+        {
+            var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detialId, false);
+            if (result == null) 
+            { 
+                return false;
+            }
+            result.IsActive = false;
+            result.UpdatedAt = DateTime.Now;
+            _repository.InvestigationDetailsRepository.UpdateSinglePatientInvestigationDetails(result);
+            await _repository.SaveAsync();
+           
+            return true;
+        }
     }
 }
 
-//[
-//  {
-//    "patientId": "14e239c2-8cfe-48ff-d1f1-08dcb0acb85a",
-//    "doctorId": "20326B15-F84D-493D-D1A6-08DCB0AA64F2",
-//    "investigationId": "DED98BF0-5B86-4EC9-9622-08DCE56309BC",
-//    "investigationUniqueId": "string",
-//    "payAmount": 450,
-//    "dueAmount": 0,
-//    "discountAmount": 0,
-//    "deliveryDate": "",
-//    "isDelivered": false
-//  }
-//]

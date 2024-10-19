@@ -17,8 +17,26 @@ namespace Repository
         public void CreatePatientInvestigationDetails(List<PatientInvestigationDetail> patientInvestigationDetails)
         {
             CreateRange(patientInvestigationDetails);   
+        }       
+
+        public async Task<List<PatientInvestigationDetail>> GetInvestigationDetailByPatientInvestigationId(Guid patientInvestigationId, bool trackChanges)
+        {
+            return await FindByCondition(i => i.PatientInvestigationId.Equals(patientInvestigationId), trackChanges).ToListAsync();
         }
 
-       
+        public async Task<PatientInvestigationDetail> GetPatientInvestigationDetailById(Guid patientInvestigationDetailId, bool trackChanges)
+        {
+            return await FindByCondition(i => i.PatientInvestigationDetailId.Equals(patientInvestigationDetailId), trackChanges).SingleOrDefaultAsync();
+        }
+
+        public void UpdatePatientInvestigationDetails(List<PatientInvestigationDetail> patientInvestigationDetails)
+        {
+            UpdateRange(patientInvestigationDetails);   
+        }
+
+        public void UpdateSinglePatientInvestigationDetails(PatientInvestigationDetail singlePatientInvestigationDetails)
+        {
+            Update(singlePatientInvestigationDetails);
+        }
     }
 }

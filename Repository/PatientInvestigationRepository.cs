@@ -18,10 +18,19 @@ namespace Repository
         {
             Create(patientInvestigation);
         }
+        public void UpdatePatientInvestigation(PatientInvestigation patientInvestigation)
+        {
+            Update(patientInvestigation);
+        }
 
         public IQueryable<PatientInvestigation> GetAllInvestigations(bool trackChanges)
         {
             return FindAll(trackChanges);
+        }
+
+        public async Task<PatientInvestigation> GetPatientInvestigationById(Guid id, bool trackChanges)
+        {
+            return await FindByCondition(i => i.PatientInvestigationId.Equals(id), trackChanges).SingleOrDefaultAsync();
         }
     }
 }

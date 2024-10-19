@@ -27,6 +27,10 @@ namespace Repository
         {
             RepositoryContext.Set<T>().AddRange(entities);
         }
+        public void UpdateRange(List<T> entities)
+        {
+            RepositoryContext.Set<T>().UpdateRange(entities);
+        }
 
         //public void Rollback()
         //{

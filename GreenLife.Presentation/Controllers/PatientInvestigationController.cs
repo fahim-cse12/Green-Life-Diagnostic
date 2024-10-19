@@ -31,7 +31,7 @@ namespace GreenLife.Presentation.Controllers
             return Created("", response);
         }
 
-        [HttpGet("filter")]
+        [HttpGet("getAllpatientinvestigaion")]
         public async Task<IActionResult> GetFilteredPatientInvestigations(
        [FromQuery] string? patientInvestigationUniqueId,
        [FromQuery] string? patientUniqueId,
@@ -53,6 +53,41 @@ namespace GreenLife.Presentation.Controllers
             return Ok(response);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdatePatientInvestigation([FromBody] PatientInvestigationDto patientInvestigationDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiErrorResponse("Invalid model", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()));
+            }
+
+            var result = await _service.patientInvestigationService.UpdatePatientInvestigationAsync(patientInvestigationDto);
+            if (result is ApiErrorResponse errorResponse)
+            {
+                // Return different status codes based on error type
+                if (errorResponse.Message == "Not Found")
+                    return NotFound(errorResponse);
+
+                if (errorResponse.Message == "Validation failed")
+                    return BadRequest(errorResponse);
+
+                return StatusCode(500, errorResponse); // Internal server error for other cases
+            }
+
+            // Successful update, return 200 OK with the updated data
+            return Ok(result);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeletePatientInvestigationDetailById(Guid id)
+        {
+            var result = await _service.patientInvestigationService.DeletePatientInvestigationDetailAsync(id);
+            if (result is ApiErrorResponse errorResponse)
+            {
+                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
+            }
+            return Created("", result);
+        }
         //[HttpPost("investigaionresultcreate", Name = "CreateInvestigationResult")]
         //public async Task<IActionResult> CreateInvestigationResult([FromBody] List<InvestigationResultCreateDto> investigationResultCreateDtos)
         //{
