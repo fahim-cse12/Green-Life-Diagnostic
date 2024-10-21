@@ -3,6 +3,7 @@ using Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,12 @@ namespace Repository
         public void CreatePatientInvestigationDetails(List<PatientInvestigationDetail> patientInvestigationDetails)
         {
             CreateRange(patientInvestigationDetails);   
-        }       
+        }
+
+        public void DeleteSinglePatientInvestigationDetails(PatientInvestigationDetail singlePatientInvestigationDetails)
+        {
+            Delete(singlePatientInvestigationDetails);
+        }
 
         public async Task<List<PatientInvestigationDetail>> GetInvestigationDetailByPatientInvestigationId(Guid patientInvestigationId, bool trackChanges)
         {
@@ -26,7 +32,9 @@ namespace Repository
 
         public async Task<PatientInvestigationDetail> GetPatientInvestigationDetailById(Guid patientInvestigationDetailId, bool trackChanges)
         {
+            
             return await FindByCondition(i => i.PatientInvestigationDetailId.Equals(patientInvestigationDetailId), trackChanges).SingleOrDefaultAsync();
+                      
         }
 
         public void UpdatePatientInvestigationDetails(List<PatientInvestigationDetail> patientInvestigationDetails)

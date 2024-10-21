@@ -20,7 +20,7 @@ namespace Service.Contracts
                                                                      int pageSize,
                                                                      bool trackChange);
         Task<ApiBaseResponse> CreatePatientInvestigationAsync(PatientInvestigationCreateDto patientInvestigationCreateDto); 
-        Task<ApiBaseResponse> UpdatePatientInvestigationAsync(PatientInvestigationDto patientInvestigationDto);
+        Task<ApiBaseResponse> UpdatePatientInvestigationAsync(PatientInvestigationUpdateDto patientInvestigationUpdateDto);
         Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid detailId);
     }
 }

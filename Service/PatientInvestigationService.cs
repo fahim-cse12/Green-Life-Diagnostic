@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using System.Diagnostics;
 using System.Threading;
 
 namespace Service
@@ -110,17 +111,24 @@ namespace Service
 
         public async Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid detailId)
         {
-            var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detailId, false);
-            if (result == null)
+            try
             {
-                return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
-            }
-            result.IsActive = false;
-            result.UpdatedAt = DateTime.Now;
-            _repository.InvestigationDetailsRepository.UpdateSinglePatientInvestigationDetails(result);
-            await _repository.SaveAsync();
+                var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detailId, false);
+                if (result == null)
+                {
+                    return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
+                }
+                _repository.InvestigationDetailsRepository.DeleteSinglePatientInvestigationDetails(result);
+                await _repository.SaveAsync();
 
-            return new ApiOkResponse<Guid>(detailId, "Patient Investigation Detail Deleted Successfully");
+                return new ApiOkResponse<Guid>(detailId, "Patient Investigation Detail Deleted Successfully");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                throw;
+            }
+            
         }
 
         public async Task<ApiBaseResponse> GetFilteredPatientInvestigationsAsync(string? patientInvestigationUniqueId, string? patientUniqueId, 
@@ -192,58 +200,29 @@ namespace Service
             }
         }
 
-        public async Task<ApiBaseResponse> UpdatePatientInvestigationAsync(PatientInvestigationDto patientInvestigationDto)
+        public async Task<ApiBaseResponse> UpdatePatientInvestigationAsync(PatientInvestigationUpdateDto patientInvestigationUpdateDto)
         {
             CancellationToken cancellationToken = default;
             var currentDate = DateTime.Now;
 
-            if (!patientInvestigationDto.InvestigationDetails.Any())
+            if (!patientInvestigationUpdateDto.PatientInvestigationDetailUpdateDtos.Any())
             {
                 return new ApiErrorResponse("Validation failed", new List<string> { "At least one investigation should be added" });
             }
 
             // Fetch existing patient investigation
-            var patientInvestigation = await _repository.PatientInvestigation.GetPatientInvestigationById(patientInvestigationDto.PatientInvestigationId, false);
+            var patientInvestigation = await _repository.PatientInvestigation.GetPatientInvestigationById(patientInvestigationUpdateDto.PatientInvestigationId, false);
             if (patientInvestigation == null)
             {
                 return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
             }
 
             // Map the updated PatientInvestigation from DTO
-            _mapper.Map(patientInvestigationDto, patientInvestigation);
+            _mapper.Map(patientInvestigationUpdateDto, patientInvestigation);
             patientInvestigation.UpdatedAt = currentDate;
 
             // Map Investigation Details (add or update based on the PatientInvestigationId)
-            var detailList = _mapper.Map<List<PatientInvestigationDetail>>(patientInvestigationDto.InvestigationDetails);
-
-            // To handle changes in investigation details, we need to decide if the existing details should be updated or removed
-            var existingDetails = await _repository.InvestigationDetailsRepository.GetInvestigationDetailByPatientInvestigationId(patientInvestigation.PatientInvestigationId, false);
-
-            foreach (var detail in existingDetails)
-            {
-                // Check if each existing detail is still in the updated list, otherwise mark for deletion or change status
-                var updatedDetail = detailList.FirstOrDefault(d => d.InvestigationId == detail.InvestigationId);
-                if (updatedDetail != null)
-                {
-                    // Update existing detail
-                    _mapper.Map(updatedDetail, detail);
-                }
-                else
-                {
-                   var isDelete = await DeletePatientInvestigationDetail(updatedDetail.PatientInvestigationDetailId);
-                    if(isDelete)
-                        return new IdNotFoundResponse<PatientInvestigationDetail>(updatedDetail.PatientInvestigationDetailId);
-                }
-            }
-
-            //// Add new details (if any)
-            foreach (var newDetail in detailList.Where(d => !existingDetails.Any(ed => ed.InvestigationId == d.InvestigationId)))
-            {
-                newDetail.PatientInvestigationId = patientInvestigation.PatientInvestigationId;
-                newDetail.CreatedAt = currentDate;
-                newDetail.UpdatedAt = currentDate;
-                existingDetails.Add(newDetail);
-            }
+            var detailList = _mapper.Map<List<PatientInvestigationDetail>>(patientInvestigationUpdateDto.PatientInvestigationDetailUpdateDtos);       
 
             // Recalculate financials based on the updated details
             patientInvestigation.CalculateFinancials(patientInvestigation.DiscountAmount);
@@ -263,6 +242,10 @@ namespace Service
                 {
                     return new ApiErrorResponse("Validation failed", detailValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
                 }
+                if (!string.IsNullOrEmpty(detail.ResultText))
+                {
+                    return new ApiErrorResponse("Update failed", "This investigation's result is created it cannot be updated");
+                }
             }
 
             // Save changes in a transaction
@@ -275,7 +258,7 @@ namespace Service
                 await _repository.SaveAsync();
 
                 // Update Investigation Details in the repository
-               _repository.InvestigationDetailsRepository.UpdatePatientInvestigationDetails(existingDetails);
+               _repository.InvestigationDetailsRepository.UpdatePatientInvestigationDetails(detailList);
                 await _repository.SaveAsync();
 
                 // Commit transaction
@@ -292,20 +275,19 @@ namespace Service
             }
         }
 
-        private async Task<bool> DeletePatientInvestigationDetail(Guid detialId)
-        {
-            var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detialId, false);
-            if (result == null) 
-            { 
-                return false;
-            }
-            result.IsActive = false;
-            result.UpdatedAt = DateTime.Now;
-            _repository.InvestigationDetailsRepository.UpdateSinglePatientInvestigationDetails(result);
-            await _repository.SaveAsync();
+        //private async Task<bool> DeletePatientInvestigationDetail(Guid detialId)
+        //{
+        //    var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detialId, false);
+        //    if (result == null) 
+        //    { 
+        //        return false;
+        //    }
+
+        //    _repository.InvestigationDetailsRepository.DeleteSinglePatientInvestigationDetails(result);
+        //    await _repository.SaveAsync();
            
-            return true;
-        }
+        //    return true;
+        //}
     }
 }
 

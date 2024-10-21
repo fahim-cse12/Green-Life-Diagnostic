@@ -54,14 +54,14 @@ namespace GreenLife.Presentation.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdatePatientInvestigation([FromBody] PatientInvestigationDto patientInvestigationDto)
+        public async Task<IActionResult> UpdatePatientInvestigation([FromBody] PatientInvestigationUpdateDto patientInvestigationUpdateDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiErrorResponse("Invalid model", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()));
             }
 
-            var result = await _service.patientInvestigationService.UpdatePatientInvestigationAsync(patientInvestigationDto);
+            var result = await _service.patientInvestigationService.UpdatePatientInvestigationAsync(patientInvestigationUpdateDto);
             if (result is ApiErrorResponse errorResponse)
             {
                 // Return different status codes based on error type

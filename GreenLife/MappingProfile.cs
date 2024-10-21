@@ -30,7 +30,8 @@ namespace GreenLife
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt.ToString("dd-MMM-yyyy"))) // Format dates
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt.ToString("dd-MMM-yyyy")));
 
-            CreateMap<PatientInvestigationDetailUpdateDto, PatientInvestigationDetail>().ReverseMap();                    // Ignoring if this is set elsewhere
+            CreateMap<PatientInvestigationDetailUpdateDto, PatientInvestigationDetail>().ReverseMap();
+            CreateMap<PatientInvestigationUpdateDto, PatientInvestigation>().ReverseMap();    // Ignoring if this is set elsewhere
 
             CreateMap<PatientInvestigationCreateDto, PatientInvestigation>().ReverseMap();
 

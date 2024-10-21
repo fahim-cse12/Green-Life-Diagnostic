@@ -19,6 +19,7 @@ namespace Shared.DataTransferObject
          decimal? PaidAmount,
          decimal? DiscountAmount,
          string? DeliveryDate,
-         List<PatientInvestigationDetailUpdateDto> PatientInvestigationDetailUpdateDtos
+         bool  IsDelivered ,
+    List<PatientInvestigationDetailUpdateDto> PatientInvestigationDetailUpdateDtos
     );
 }

@@ -20,7 +20,7 @@ namespace Entities.Models
         public DateTime? ResultDate { get; set; } // Date when result was created
         public decimal PaymentAmount { get; set; }
         public bool IsDelivered { get; set; }
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 

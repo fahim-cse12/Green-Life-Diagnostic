@@ -9,13 +9,14 @@ namespace Shared.DataTransferObject
     public class PatientInvestigationDetailDto
     {
         public Guid PatientInvestigationDetailId { get; set; } // Corrected to match mapping
+        public Guid PatientInvestigationId { get; set; }
         public Guid InvestigationId { get; set; } // Mapped from InvestigationId
         public string InvestigationName { get; set; } // Mapped from Investigation
         public string Description { get; set; }      // Mapped from Investigation
         public string ResultText { get; set; }
         public decimal PaymentAmount { get; set; }
         public bool IsDelivered { get; set; }
-        public bool IsActive { get; set; }
+        public bool? IsActive { get; set; }
         public string CreatedAt { get; set; }        // Date formatted as string
         public string UpdatedAt { get; set; }        // Date formatted as string
 
@@ -25,6 +26,7 @@ namespace Shared.DataTransferObject
         // Optional: Constructor with parameters (not used by AutoMapper, but can be helpful elsewhere)
         public PatientInvestigationDetailDto(
             Guid patientInvestigationDetailId,
+            Guid patientInvestigationId,
             Guid investigationId,
             string investigationName,
             string description,
@@ -36,6 +38,7 @@ namespace Shared.DataTransferObject
             string updatedAt)
         {
             PatientInvestigationDetailId = patientInvestigationDetailId;
+            PatientInvestigationId = patientInvestigationId;
             InvestigationId = investigationId;
             InvestigationName = investigationName;
             Description = description;
