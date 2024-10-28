@@ -118,6 +118,10 @@ namespace Service
                 {
                     return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
                 }
+                if (!string.IsNullOrEmpty(result.ResultText))
+                {
+                    return new ApiErrorResponse("Update failed", $"{result.PatientInvestigationDetailId} This investigation's result is created it cannot be deleted");
+                }
                 _repository.InvestigationDetailsRepository.DeleteSinglePatientInvestigationDetails(result);
                 await _repository.SaveAsync();
 
@@ -221,47 +225,51 @@ namespace Service
             _mapper.Map(patientInvestigationUpdateDto, patientInvestigation);
             patientInvestigation.UpdatedAt = currentDate;
 
-            // Map Investigation Details (add or update based on the PatientInvestigationId)
-            var detailList = _mapper.Map<List<PatientInvestigationDetail>>(patientInvestigationUpdateDto.PatientInvestigationDetailUpdateDtos);       
-
-            // Recalculate financials based on the updated details
-            patientInvestigation.CalculateFinancials(patientInvestigation.DiscountAmount);
-            patientInvestigation.UpdateDueAmount();
-
-            // Validate PatientInvestigation and Details
-            var investigationValidationResult = await _patientInvestigationValidator.ValidateAsync(patientInvestigation);
-            if (!investigationValidationResult.IsValid)
-            {
-                return new ApiErrorResponse("Validation failed", investigationValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
-            }
-
-            foreach (var detail in detailList)
-            {
-                var detailValidationResult = await _patientInvestigationDetailValidator.ValidateAsync(detail);
-                if (!detailValidationResult.IsValid)
-                {
-                    return new ApiErrorResponse("Validation failed", detailValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
-                }
-                if (!string.IsNullOrEmpty(detail.ResultText))
-                {
-                    return new ApiErrorResponse("Update failed", "This investigation's result is created it cannot be updated");
-                }
-            }
-
-            // Save changes in a transaction
             await _repository.BeginTransaction(cancellationToken);
-
             try
             {
-                // Update PatientInvestigation in the repository
                 _repository.PatientInvestigation.UpdatePatientInvestigation(patientInvestigation);
-                await _repository.SaveAsync();
+               
 
-                // Update Investigation Details in the repository
-               _repository.InvestigationDetailsRepository.UpdatePatientInvestigationDetails(detailList);
-                await _repository.SaveAsync();
+                foreach (var detail in patientInvestigationUpdateDto.PatientInvestigationDetailUpdateDtos)
+                {
+                    // For update on existing
+                    if (detail.PatientInvestigationDetailId != null)
+                    {
+                        var existingDetail = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detail.PatientInvestigationDetailId, false);
+                        if (existingDetail != null)
+                        {
+                            var updateDetail = _mapper.Map(detail, existingDetail);
+                            updateDetail.UpdatedAt = currentDate;
+                            var detailValidationResult = await _patientInvestigationDetailValidator.ValidateAsync(updateDetail);
+                            if (!detailValidationResult.IsValid)
+                            {
+                                return new ApiErrorResponse("Validation failed", detailValidationResult.Errors.Select(e => e.ErrorMessage).ToList());
+                            }
+                            _repository.InvestigationDetailsRepository.UpdateSinglePatientInvestigationDetails(updateDetail);
 
-                // Commit transaction
+                        }
+                        else
+                        {
+                            return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation Details not found" });
+                        }
+
+                    }
+                    else
+                    {
+                        var newDetail = _mapper.Map<PatientInvestigationDetail>(detail);
+                        newDetail.CreatedAt = currentDate;
+                        newDetail.CreatedAt = currentDate;
+                        newDetail.UpdatedAt = currentDate;
+                        newDetail.IsDelivered = false;
+                        newDetail.IsActive = true;
+
+                        _repository.InvestigationDetailsRepository.CreateSinglePatientInvestigationDetails(newDetail);
+                    }
+
+                    //await _repository.SaveAsync();
+                }
+                await _repository.SaveAsync();
                 await _repository.CommitTransaction(cancellationToken);
 
                 // Map to DTO and return success response
@@ -272,7 +280,8 @@ namespace Service
             {
                 await _repository.Rollback(cancellationToken);
                 return new ApiErrorResponse("Something Went Wrong", ex.Message);
-            }
+            }                      
+            
         }
 
         //private async Task<bool> DeletePatientInvestigationDetail(Guid detialId)

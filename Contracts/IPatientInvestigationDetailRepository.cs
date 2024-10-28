@@ -10,6 +10,7 @@ namespace Contracts
     public interface IPatientInvestigationDetailRepository
     {
         void CreatePatientInvestigationDetails(List<PatientInvestigationDetail> patientInvestigationDetails);
+        void CreateSinglePatientInvestigationDetails(PatientInvestigationDetail patientInvestigationDetails);
         void UpdatePatientInvestigationDetails(List<PatientInvestigationDetail> patientInvestigationDetails);
         void UpdateSinglePatientInvestigationDetails(PatientInvestigationDetail singlePatientInvestigationDetails);
         void DeleteSinglePatientInvestigationDetails(PatientInvestigationDetail singlePatientInvestigationDetails);

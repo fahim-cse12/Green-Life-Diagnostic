@@ -20,6 +20,11 @@ namespace Repository
             CreateRange(patientInvestigationDetails);   
         }
 
+        public void CreateSinglePatientInvestigationDetails(PatientInvestigationDetail patientInvestigationDetails)
+        {
+            Create(patientInvestigationDetails);
+        }
+
         public void DeleteSinglePatientInvestigationDetails(PatientInvestigationDetail singlePatientInvestigationDetails)
         {
             Delete(singlePatientInvestigationDetails);
