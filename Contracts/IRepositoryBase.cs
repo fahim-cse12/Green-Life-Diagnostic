@@ -12,6 +12,7 @@ namespace Contracts
     {
         IQueryable<T> FindAll(bool trackChanges);
         IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges);
+        Task<T> FindByConditionAsync(Expression<Func<T, bool>> expression, bool trackChanges);
         void Create(T entity);
         void CreateRange(List<T> entities);
         void UpdateRange(List<T> entities);

@@ -78,16 +78,7 @@ namespace GreenLife.Presentation.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeletePatientInvestigationDetailById(Guid id)
-        {
-            var result = await _service.patientInvestigationService.DeletePatientInvestigationDetailAsync(id);
-            if (result is ApiErrorResponse errorResponse)
-            {
-                return BadRequest(new { errorResponse.Message, errorResponse.Errors });
-            }
-            return Created("", result);
-        }
+     
         //[HttpPost("investigaionresultcreate", Name = "CreateInvestigationResult")]
         //public async Task<IActionResult> CreateInvestigationResult([FromBody] List<InvestigationResultCreateDto> investigationResultCreateDtos)
         //{

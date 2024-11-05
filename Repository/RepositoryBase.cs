@@ -19,6 +19,7 @@ namespace Repository
         public IQueryable<T> FindAll(bool trackChanges) => !trackChanges ? RepositoryContext.Set<T>().AsNoTracking() : RepositoryContext.Set<T>();
         public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges) =>
             !trackChanges ? RepositoryContext.Set<T>().Where(expression).AsNoTracking() : RepositoryContext.Set<T>().Where(expression);
+
         public void Create(T entity) => RepositoryContext.Set<T>().Add(entity);
         public void Update(T entity) => RepositoryContext.Set<T>().Update(entity);
         public void Delete(T entity) => RepositoryContext.Set<T>().Remove(entity);
@@ -30,6 +31,19 @@ namespace Repository
         public void UpdateRange(List<T> entities)
         {
             RepositoryContext.Set<T>().UpdateRange(entities);
+        }
+
+        public async Task<T> FindByConditionAsync(Expression<Func<T, bool>> expression, bool trackChanges)
+        {
+            if (trackChanges)
+            {
+               return  await RepositoryContext.Set<T>().AsNoTracking().FirstOrDefaultAsync(expression);
+            }
+            else
+            {
+                return await RepositoryContext.Set<T>().FirstOrDefaultAsync(expression);
+            }
+              
         }
 
         //public void Rollback()

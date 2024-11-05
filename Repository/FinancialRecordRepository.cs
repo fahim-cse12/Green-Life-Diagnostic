@@ -35,6 +35,11 @@ namespace Repository
            return await FindByCondition(x=> x.Id.Equals(financialRecordId), trackChanges).SingleOrDefaultAsync();
         }
 
+        public async Task<FinancialRecord> GetFinancialRecordsByConditionAsync(Expression<Func<FinancialRecord, bool>> condition, bool trackChanges)
+        {
+            return await FindByConditionAsync(condition, trackChanges);
+        }
+
         public void UpdateFinancialRecord(FinancialRecord financialRecord)
         {
             Update(financialRecord);

@@ -16,7 +16,7 @@ namespace Entities.Models
         // Financials
         public decimal TotalAmount { get; private set; }
         public decimal DiscountAmount { get; private set; }
-        public decimal PaidAmount { get; private set; }
+        public decimal PaidAmount { get; set; }
         public decimal DueAmount { get; private set; }
 
         public DateTime? DeliveryDate { get; set; }

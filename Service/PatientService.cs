@@ -76,7 +76,8 @@ namespace Service
                 var financialRecord = new FinancialRecord
                 {
                     Income = ticketEntity.Amount,
-                    Purpose = $"Ticket purchage for Ticket or Investigation UniqueId: {ticketEntity.UniqueId}",
+                    UniqueId = ticketEntity.UniqueId,
+                    Purpose = $"From Ticket or Investigation UniqueId: {ticketEntity.UniqueId}",
                     Status = true,
                     RecordDate = DateTime.Now,
                     CreatedAt = DateTime.Now

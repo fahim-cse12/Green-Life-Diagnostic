@@ -21,6 +21,6 @@ namespace Service.Contracts
                                                                      bool trackChange);
         Task<ApiBaseResponse> CreatePatientInvestigationAsync(PatientInvestigationCreateDto patientInvestigationCreateDto); 
         Task<ApiBaseResponse> UpdatePatientInvestigationAsync(PatientInvestigationUpdateDto patientInvestigationUpdateDto);
-        Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid detailId);
+        Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid patientInvestigaionId,Guid detailId);
     }
 }

@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace Shared.DataTransferObject
 {
-    public record FinanceRecordCreateDto(DateTime RecordDate,string Purpose, decimal Income,decimal Expense);
+    public record FinanceRecordCreateDto(DateTime RecordDate, string Purpose, decimal Income,decimal Expense);
     
 }

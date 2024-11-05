@@ -34,6 +34,7 @@ namespace Service
                 var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
                 return new ApiErrorResponse("Validation failed", errorMessages);
             }
+            financialRecordEntity.UniqueId = $"FIN{DateTime.Now:ddMMyyHHmmss}";
             financialRecordEntity.Status = true;
             financialRecordEntity.CreatedAt = DateTime.Now;
             _repository.FinancialRecord.CreateFinancialRecord(financialRecordEntity);

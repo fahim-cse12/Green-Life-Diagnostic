@@ -94,12 +94,14 @@ namespace Service
                 // Save all details in batch
                 _repository.InvestigationDetailsRepository.CreatePatientInvestigationDetails(detailList);
                 await _repository.SaveAsync();
-
                 // Commit transaction
                 await _repository.CommitTransaction(cancellationToken);
 
                 // Map to DTO
                 var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+                //Save financial record
+                SaveFinancialRecord(patientInvestigationDto.TotalAmount, patientInvestigationDto.PatientInvestigationUniqueId);
+
                 return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, "Patient Investigation Created Successfully");
             }
             catch (Exception ex)
@@ -109,21 +111,46 @@ namespace Service
             }
         }
 
-        public async Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid detailId)
+        private async Task<bool> SaveFinancialRecord(decimal payamount, string uniqueId)
+        {
+            var financialRecord = new FinancialRecord
+            {
+                Income = payamount,
+                UniqueId = uniqueId,
+                Purpose = $"From Ticket or Investigation UniqueId: {uniqueId}",
+                Status = true,
+                RecordDate = DateTime.Now,
+                CreatedAt = DateTime.Now
+            };
+            _repository.FinancialRecord.CreateFinancialRecord(financialRecord);
+            await _repository.SaveAsync();
+
+            return true;
+        }
+
+        public async Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid patientInvestigaionId ,Guid detailId)
         {
             try
             {
-                var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detailId, false);
-                if (result == null)
+                var patientInvestigaionResult = await _repository.PatientInvestigation.GetPatientInvestigationById(patientInvestigaionId, false);
+                var isExist = patientInvestigaionResult.InvestigationDetails.FirstOrDefault(i => i.PatientInvestigationDetailId.Equals(detailId));
+                if(isExist == null)
                 {
-                    return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
+                    return new ApiErrorResponse("Not Found", new List<string> { "This Investigation detail not belong to this Patient Investigaion" });
                 }
-                if (!string.IsNullOrEmpty(result.ResultText))
+                //var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detailId, false);
+                //if (result == null)
+                //{
+                //    return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
+                //}
+                if (!string.IsNullOrEmpty(isExist.ResultText))
                 {
-                    return new ApiErrorResponse("Update failed", $"{result.PatientInvestigationDetailId} This investigation's result is created it cannot be deleted");
+                    return new ApiErrorResponse("Update failed", $"{isExist.PatientInvestigationDetailId} This investigation's result is created it cannot be deleted");
                 }
-                _repository.InvestigationDetailsRepository.DeleteSinglePatientInvestigationDetails(result);
+                _repository.InvestigationDetailsRepository.DeleteSinglePatientInvestigationDetails(isExist);
                 await _repository.SaveAsync();
+
+                UpdateFinancialRecord(patientInvestigaionResult, isExist.PaymentAmount);
 
                 return new ApiOkResponse<Guid>(detailId, "Patient Investigation Detail Deleted Successfully");
             }
@@ -134,7 +161,21 @@ namespace Service
             }
             
         }
+        private async Task<bool> UpdateFinancialRecord(PatientInvestigation patientInvestigation, decimal deductAmount)
+        {
+            patientInvestigation.PaidAmount = patientInvestigation.PaidAmount - deductAmount;
+         
+            var existingFinancialRecord = await _repository.FinancialRecord.GetFinancialRecordsByConditionAsync(i=> i.UniqueId.Equals(patientInvestigation.PatientInvestigationUniqueId), false);
 
+            existingFinancialRecord.Income = patientInvestigation.PaidAmount;
+            existingFinancialRecord.UpdatedAt = DateTime.Now;
+            existingFinancialRecord.UpdatedBy = null;
+
+            _repository.FinancialRecord.UpdateFinancialRecord(existingFinancialRecord);
+            await _repository.SaveAsync();
+                      
+            return true;
+        }
         public async Task<ApiBaseResponse> GetFilteredPatientInvestigationsAsync(string? patientInvestigationUniqueId, string? patientUniqueId, 
             string? patientName, string? patientMobileNo, DateTime? fromDate, DateTime? toDate, int pageNumber, int pageSize, bool trackChanges)
         {
@@ -274,6 +315,9 @@ namespace Service
 
                 // Map to DTO and return success response
                 var patientInvestigationDtoResult = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+
+                SaveFinancialRecord(patientInvestigationDtoResult.TotalAmount, patientInvestigationDtoResult.PatientInvestigationUniqueId);
+
                 return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDtoResult, "Patient Investigation Updated Successfully");
             }
             catch (Exception ex)
