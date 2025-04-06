@@ -116,8 +116,13 @@ namespace GreenLife.Extentions
                     ValidIssuer = jwtConfiguration.ValidIssuer,
                     ValidAudience = jwtConfiguration.ValidAudience,
 
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                    // Add 4 hours grace period after expiration
+                    LifetimeValidator = (notBefore, expires, token, parameters) =>
+                        expires != null && expires > DateTime.UtcNow.AddHours(-4)
                 };
+                // Optional: eliminate default 5-min clock skew
+                options.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
             });
         }
         public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) =>
