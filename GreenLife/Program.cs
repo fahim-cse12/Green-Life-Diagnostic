@@ -30,15 +30,7 @@ builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Services.ConfigureVersioning();
-builder.Services.AddControllers(config =>
-{
-    config.RespectBrowserAcceptHeader = true;
-    config.ReturnHttpNotAcceptable = true;
-    //config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
-    //{
-    //    Duration = 120
-    //});
-});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
 builder.Services.ConfigureFluentValidation();
