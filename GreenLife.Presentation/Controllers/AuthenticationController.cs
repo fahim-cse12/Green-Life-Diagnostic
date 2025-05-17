@@ -1,6 +1,5 @@
 ﻿using Entities.Responses;
 using GreenLife.Presentation.ActionFilter;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObject;

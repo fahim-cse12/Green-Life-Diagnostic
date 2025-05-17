@@ -3,9 +3,7 @@ using GreenLife.Extentions;
 using GreenLife.Presentation;
 using GreenLife.Presentation.ActionFilter;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.OpenApi.Models;
 using NLog;
-using Service.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 LogManager.Setup().LoadConfigurationFromFile(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));

@@ -1,11 +1,4 @@
-﻿using Entities.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entities.Responses
+﻿namespace Entities.Responses
 {
     public class IdNotFoundResponse<T> : ApiNotFoundResponse
     {

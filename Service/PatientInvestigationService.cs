@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
 using Shared.DataTransferObject;
 using System.Diagnostics;
-using System.Threading;
 
 namespace Service
 {

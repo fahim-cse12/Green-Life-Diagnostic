@@ -1,5 +1,4 @@
 ﻿using Entities.Responses;
-using GreenLife.Presentation.Extentions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;

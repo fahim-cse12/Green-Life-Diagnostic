@@ -1,5 +1,4 @@
 ﻿using Entities.Responses;
-using Microsoft.AspNetCore.Identity;
 using Shared.DataTransferObject;
 
 namespace Service.Contracts

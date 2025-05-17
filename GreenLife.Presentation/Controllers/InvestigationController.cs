@@ -1,13 +1,7 @@
 ﻿using Entities.Responses;
-using GreenLife.Presentation.Extentions;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GreenLife.Presentation.Controllers
 {

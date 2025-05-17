@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
 using Shared.DataTransferObject;
 using Shared.Utility;
-using System.Data;
 
 namespace Service
 {
