@@ -9,6 +9,6 @@
         public string Mobile { get; init; }
         public int Age { get; init; }
         public string Address { get; init; }
-        public int PatientType { get; init; } // "Old" or "New"
+        public bool IsNewPatient { get; init; } // "Old" or "New"
     }
 }

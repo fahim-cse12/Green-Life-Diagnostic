@@ -7,7 +7,7 @@
         public string TicketNo { get; set; }
         public string PatientName { get; set; }
         public int Age { get; set; }
-        public int PatientType { get; set; }
+        public bool IsNewPatient { get; set; }
         public string Address { get; set; }
         public string Mobile { get; set; }
         public DateTime LastVisited { get; set; }

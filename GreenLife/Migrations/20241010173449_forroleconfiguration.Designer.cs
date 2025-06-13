@@ -187,8 +187,8 @@ namespace GreenLife.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PatientType")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsNewPatient")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PatientUniqueId")
                         .IsRequired()
@@ -466,8 +466,8 @@ namespace GreenLife.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PatientType")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsNewPatient")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("TicketId")
                         .HasColumnType("uniqueidentifier");
