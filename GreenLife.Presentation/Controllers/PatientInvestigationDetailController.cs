@@ -7,16 +7,16 @@ namespace GreenLife.Presentation.Controllers
     [Route("api/patientinvestigationdetail")]
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]
-    public class PatientInvestigaionDetailController : ApiControllerBase
+    public class PatientInvestigationDetailController : ApiControllerBase
     {
         private readonly IServiceManager _service;
-        public PatientInvestigaionDetailController(IServiceManager service)
+        public PatientInvestigationDetailController(IServiceManager service)
         {
             _service = service;
 
         }
 
-        [HttpDelete("{id:guid}", Name = "DeletePatientInvestigationDetails")]
+        [HttpDelete("patient-investigations/{patientInvestigationId:guid}/details/{id:guid}",  Name = "DeletePatientInvestigationDetails")]
         public async Task<IActionResult> DeletePatientInvestigationDetailById(Guid patientInvestigationId, Guid id)
         {
             var result = await _service.patientInvestigationService.DeletePatientInvestigationDetailAsync(patientInvestigationId,id);

@@ -8,20 +8,16 @@ namespace GreenLife.Presentation.Controllers
     [Route("api/patientinvestigation")]
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]
-    public class PatientInvestigationController : ApiControllerBase
+    public class PatientInvestigationController(IServiceManager service) : ApiControllerBase
     {
-        private readonly IServiceManager _service;
-        public PatientInvestigationController(IServiceManager service)
-        {
-            _service = service;
-
-        }
-
-
-        [HttpPost("investigaioncreate", Name = "CreatePatientInvestigation")]
+        [HttpPost("investigationcreate", Name = "CreatePatientInvestigation")]
         public async Task<IActionResult> CreatePatientInvestigation([FromBody] PatientInvestigationCreateDto investigationCreateDtos)
         {
-            var response = await _service.patientInvestigationService.CreatePatientInvestigationAsync(investigationCreateDtos);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var response = await service.patientInvestigationService.CreatePatientInvestigationAsync(investigationCreateDtos);
 
             if (response is ApiErrorResponse errorResponse)
             {
@@ -31,7 +27,7 @@ namespace GreenLife.Presentation.Controllers
             return Created("", response);
         }
 
-        [HttpGet("getAllpatientinvestigaion")]
+        [HttpGet("getAllPatientInvestigation")]
         public async Task<IActionResult> GetFilteredPatientInvestigations(
        [FromQuery] string? patientInvestigationUniqueId,
        [FromQuery] string? patientUniqueId,
@@ -41,7 +37,7 @@ namespace GreenLife.Presentation.Controllers
        [FromQuery] DateTime? toDate)
         {
             // Call service method and pass the query parameters
-            var response = await _service.patientInvestigationService.GetFilteredPatientInvestigationsAsync(
+            var response = await service.patientInvestigationService.GetFilteredPatientInvestigationsAsync(
                 patientInvestigationUniqueId, patientUniqueId, patientName, patientMobileNo, fromDate, toDate, 1, 10, false);
 
             // If it's an error response, return appropriate error status
@@ -61,7 +57,7 @@ namespace GreenLife.Presentation.Controllers
                 return BadRequest(new ApiErrorResponse("Invalid model", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList()));
             }
 
-            var result = await _service.patientInvestigationService.UpdatePatientInvestigationAsync(patientInvestigationUpdateDto);
+            var result = await service.patientInvestigationService.UpdatePatientInvestigationAsync(patientInvestigationUpdateDto);
             if (result is ApiErrorResponse errorResponse)
             {
                 // Return different status codes based on error type

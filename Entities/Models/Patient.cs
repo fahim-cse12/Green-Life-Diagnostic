@@ -12,7 +12,7 @@ namespace Entities.Models
         public string Mobile { get; set; }
         public int Age { get; set; }
         public string Address { get; set; }
-        public int PatientType { get; set; } // "Old" or "New"
+        public bool IsNewPatient { get; set; } // "Old" or "New"
         public ICollection<Ticket> Tickets { get; set; }
     }
 }
