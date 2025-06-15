@@ -94,7 +94,7 @@ namespace Service
             }
         }
 
-        public async Task<ApiBaseResponse> PatientSearchByQuery(string ticketId, string patientName = null, string mobileNo = null, string doctorName = null, DateTime? startDate = null, DateTime? endDate = null)
+        public async Task<ApiBaseResponse> PatientSearchByQuery(string? ticketId, string? patientName, string? mobileNo, string? doctorName, DateTime? startDate, DateTime? endDate)
         {
             string sp = DatabaseProcedure.PatientSearchByQuery;
             var parameters = new List<SqlParameter>
@@ -109,12 +109,7 @@ namespace Service
 
             var result = await _repository.ExecuteStoredProcedureToGetData<PatientHistoryDto>(sp, parameters).ToListAsync();
 
-            if (!result.Any())
-            {
-                return new ApiOkResponse<IEnumerable<PatientHistoryDto>>(null, "Data not found");
-            }
-
-            return new ApiOkResponse<IEnumerable<PatientHistoryDto>>(result, "Patients retrieved successfully");
+            return !result.Any() ? new ApiOkResponse<IEnumerable<PatientHistoryDto>>([], "Data not found") : new ApiOkResponse<IEnumerable<PatientHistoryDto>>(result, "Patients retrieved successfully");
         }
 
         public async Task<ApiBaseResponse> DeletePurchasedTicketAsync(Guid ticketId, bool trackChanges)
