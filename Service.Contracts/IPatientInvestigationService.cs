@@ -14,6 +14,8 @@ namespace Service.Contracts
                                                                      int pageNumber,
                                                                      int pageSize,
                                                                      bool trackChange);
+        Task<ApiBaseResponse> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges);
+
         Task<ApiBaseResponse> CreatePatientInvestigationAsync(PatientInvestigationCreateDto patientInvestigationCreateDto); 
         Task<ApiBaseResponse> UpdatePatientInvestigationAsync(PatientInvestigationUpdateDto patientInvestigationUpdateDto);
         Task<ApiBaseResponse> DeletePatientInvestigationDetailAsync(Guid patientInvestigaionId,Guid detailId);

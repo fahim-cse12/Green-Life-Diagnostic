@@ -327,6 +327,19 @@ namespace Service
             
         }
 
+        public async Task<ApiBaseResponse> GetPatientInvestigationAsync(Guid patientInvestigationId, bool trackChanges)
+        {
+            var patientInvestigation = await _repository.PatientInvestigation.GetPatientInvestigationById(patientInvestigationId, false);
+            if (patientInvestigation == null)
+            {
+                return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
+            }
+            patientInvestigation.InvestigationDetails = await _repository.InvestigationDetailsRepository.GetInvestigationDetailByPatientInvestigationId(patientInvestigationId, false);
+            var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+
+            return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, "Patient Investigation Created Successfully");
+        }
+
         //private async Task<bool> DeletePatientInvestigationDetail(Guid detialId)
         //{
         //    var result = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detialId, false);
@@ -337,7 +350,7 @@ namespace Service
 
         //    _repository.InvestigationDetailsRepository.DeleteSinglePatientInvestigationDetails(result);
         //    await _repository.SaveAsync();
-           
+
         //    return true;
         //}
     }

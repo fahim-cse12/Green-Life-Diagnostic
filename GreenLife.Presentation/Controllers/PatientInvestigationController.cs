@@ -48,7 +48,17 @@ namespace GreenLife.Presentation.Controllers
 
             return Ok(response);
         }
+        [HttpGet("GetPatientInvestigation/{id:guid}", Name = "GetPatientInvestigationById")]
+        public async Task<IActionResult> GetPatientInvestigation(Guid id)
+        {
+            var baseResult = await service.patientInvestigationService.GetPatientInvestigationAsync(id, trackChanges: false);
+            if (!baseResult.Success)
+            {
+                return ProcessError(baseResult);
+            }
 
+            return Ok(baseResult);
+        }
         [HttpPut]
         public async Task<IActionResult> UpdatePatientInvestigation([FromBody] PatientInvestigationUpdateDto patientInvestigationUpdateDto)
         {
