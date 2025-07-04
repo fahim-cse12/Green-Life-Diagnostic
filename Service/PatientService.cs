@@ -74,7 +74,7 @@ namespace Service
 
                 var financialRecord = new FinancialRecord
                 {
-                    Income = ticketEntity.Amount,
+                    Income = ticketEntity.Amount - ticketEntity.Discount,
                     UniqueId = ticketEntity.UniqueId,
                     Purpose = $"From Ticket or Investigation UniqueId: {ticketEntity.UniqueId}",
                     Status = true,
