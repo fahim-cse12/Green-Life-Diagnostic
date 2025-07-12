@@ -26,7 +26,9 @@ namespace Repository
 
         public async Task<List<PatientInvestigationDetail>> GetInvestigationDetailByPatientInvestigationId(Guid patientInvestigationId, bool trackChanges)
         {
-            return await FindByCondition(i => i.PatientInvestigationId.Equals(patientInvestigationId), trackChanges).ToListAsync();
+            return await FindByCondition(i => i.PatientInvestigationId.Equals(patientInvestigationId), trackChanges)
+                .Include(i => i.Investigation)
+                .ToListAsync();
         }
 
         public async Task<PatientInvestigationDetail> GetPatientInvestigationDetailById(Guid patientInvestigationDetailId, bool trackChanges)

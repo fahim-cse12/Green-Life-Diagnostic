@@ -56,7 +56,7 @@ namespace Service
 
             // Calculate financials
             patientInvestigation.CalculateFinancials(patientInvestigation.DiscountAmount);
-            patientInvestigation.UpdateDueAmount();
+            //patientInvestigation.UpdateDueAmount();
             patientInvestigation.InvestigationDetails = null;
             // Validate PatientInvestigation
             var investigationValidationResult = await _patientInvestigationValidator.ValidateAsync(patientInvestigation);
@@ -99,7 +99,7 @@ namespace Service
                 // Map to DTO
                 var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
                 //Save financial record
-                SaveFinancialRecord(patientInvestigationDto.TotalAmount, patientInvestigationDto.PatientInvestigationUniqueId);
+                SaveFinancialRecord(patientInvestigationDto.PaidAmount, patientInvestigationDto.PatientInvestigationUniqueId);
 
                 return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, "Patient Investigation Created Successfully");
             }
@@ -221,8 +221,9 @@ namespace Service
                 var patientInvestigations = await query
                     .Include(pi => pi.InvestigationDetails)
                     .ThenInclude(detail => detail.Investigation)
-                    .Skip((pageNumber - 1) * pageSize) // Skip the previous pages
-                    .Take(pageSize) // Take only the page size number of records
+                    .OrderByDescending(pi => pi.CreatedAt) // Order by the creation date of the patient investigation, descending
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
                 // Map the result to DTO
