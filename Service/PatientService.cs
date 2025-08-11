@@ -85,7 +85,23 @@ namespace Service
                 await _repository.SaveAsync();
                 await _repository.CommitTransaction(cancellationToken);
 
-                return new ApiOkResponse<string>(patientEntity.Name, $"Purchase Ticket confirmed for Patient: {patientEntity.Name}");
+
+                var patientTicketDto = new PatientTicketDto
+                {
+                    PatientUniqueId = patientEntity.PatientUniqueId,
+                    Name = patientEntity.Name,
+                    Gender = patientEntity.Gender,
+                    Mobile = patientEntity.Mobile,
+                    Age = patientEntity.Age,
+                    Address = patientEntity.Address,
+                    DoctorId = ticketEntity.DoctorId,
+                    TicketUniqueId = ticketEntity.UniqueId,
+                    Amount = ticketEntity.Amount,
+                    Discount = ticketEntity.Discount,
+                    CreatedAt = ticketEntity.CreatedAt
+                };
+
+                return new ApiOkResponse<PatientTicketDto>(patientTicketDto, $"Purchase Ticket confirmed for Patient: {patientEntity.Name}");
             }
             catch (Exception ex)
             {
