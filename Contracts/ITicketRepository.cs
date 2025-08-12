@@ -6,6 +6,7 @@ namespace Contracts
     public interface ITicketRepository
     {
         Task<IEnumerable<Ticket>> GetAllTicketAsync(bool trackChanges);
+        IQueryable<Ticket> GetTicketsByCondition(Expression<Func<Ticket, bool>> condition, bool trackChanges);
         Task<Ticket> GetTicketAsync(Guid ticketId, bool trackChanges);
         public Task<Ticket> FindTicketsByConditionAsync(Expression<Func<Ticket, bool>> condition, bool trackChanges);
         void CreateTicket(Ticket ticket);

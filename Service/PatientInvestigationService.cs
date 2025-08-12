@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
 using Shared.DataTransferObject;
 using System.Diagnostics;
+using static Shared.Utility.EnumValue;
 
 namespace Service
 {
@@ -114,6 +115,7 @@ namespace Service
         {
             var financialRecord = new FinancialRecord
             {
+                FinancialType = (int)FinancialType.Income,
                 Income = payamount,
                 UniqueId = uniqueId,
                 Purpose = $"From Ticket or Investigation UniqueId: {uniqueId}",

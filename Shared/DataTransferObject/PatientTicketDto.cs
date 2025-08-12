@@ -16,6 +16,7 @@ namespace Shared.DataTransferObject
         public string Address { get; init; }
         public Guid DoctorId { get; set; }
         public string TicketUniqueId { get; set; }
+        public int SerialNo { get; set; }
         public decimal Amount { get; set; }
         public decimal Discount { get; set; }
         public DateTime CreatedAt { get; set; }

@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
 using Shared.DataTransferObject;
 using Shared.Utility;
+using static Shared.Utility.EnumValue;
 
 namespace Service
 {
@@ -33,17 +34,18 @@ namespace Service
         public async Task<ApiBaseResponse> PurchageTicketAsync(PurchageTicketDto purchaseTicket)
         {
             var errorMessages = new List<string>();
+
+            // Map and validate patient
             var patientEntity = _mapper.Map<Patient>(purchaseTicket.patientDto);
             var validationResultForPatient = await _patientValidator.ValidateAsync(patientEntity);
-
             if (!validationResultForPatient.IsValid)
             {
                 errorMessages.AddRange(validationResultForPatient.Errors.Select(e => e.ErrorMessage));
             }
 
+            // Map ticket and validate doctor fee
             var ticketEntity = _mapper.Map<Ticket>(purchaseTicket.ticketDto);
-
-            if (ticketEntity.Amount == 0)
+            if (ticketEntity.Amount <= 0)
             {
                 errorMessages.Add("Doctor fee is required");
             }
@@ -58,22 +60,34 @@ namespace Service
 
             try
             {
+                // Save patient
                 patientEntity.PatientUniqueId = $"PAT{DateTime.Now:ddMMyyHHmmss}";
                 patientEntity.Status = true;
                 patientEntity.CreatedAt = DateTime.Now;
                 _repository.Patient.CreatePatient(patientEntity);
                 await _repository.SaveAsync();
 
+                // Get today's next serial for this doctor
+                var today = DateTime.Now.Date;
+                var lastSerial = await _repository.Ticket
+                    .GetTicketsByCondition(t => t.DoctorId == ticketEntity.DoctorId && t.CreatedAt.Date == today, false)
+                    .MaxAsync(t => (int?)t.SerialNo) ?? 0;
+
+                var nextSerial = lastSerial + 1;
+
+                // Save ticket
                 ticketEntity.PatientId = patientEntity.Id;
                 ticketEntity.UniqueId = $"TKT{DateTime.Now:ddMMyyHHmmss}";
+                ticketEntity.SerialNo = nextSerial;
                 ticketEntity.Status = true;
                 ticketEntity.CreatedAt = DateTime.Now;
-
                 _repository.Ticket.CreateTicket(ticketEntity);
                 await _repository.SaveAsync();
 
+                // Save financial record
                 var financialRecord = new FinancialRecord
                 {
+                    FinancialType = (int)FinancialType.Income,
                     Income = ticketEntity.Amount - ticketEntity.Discount,
                     UniqueId = ticketEntity.UniqueId,
                     Purpose = $"From Ticket or Investigation UniqueId: {ticketEntity.UniqueId}",
@@ -83,9 +97,10 @@ namespace Service
                 };
                 _repository.FinancialRecord.CreateFinancialRecord(financialRecord);
                 await _repository.SaveAsync();
+
                 await _repository.CommitTransaction(cancellationToken);
 
-
+                // Prepare response
                 var patientTicketDto = new PatientTicketDto
                 {
                     PatientUniqueId = patientEntity.PatientUniqueId,
@@ -96,12 +111,16 @@ namespace Service
                     Address = patientEntity.Address,
                     DoctorId = ticketEntity.DoctorId,
                     TicketUniqueId = ticketEntity.UniqueId,
+                    SerialNo = ticketEntity.SerialNo,
                     Amount = ticketEntity.Amount,
                     Discount = ticketEntity.Discount,
                     CreatedAt = ticketEntity.CreatedAt
                 };
 
-                return new ApiOkResponse<PatientTicketDto>(patientTicketDto, $"Purchase Ticket confirmed for Patient: {patientEntity.Name}");
+                return new ApiOkResponse<PatientTicketDto>(
+                    patientTicketDto,
+                    $"Purchase Ticket confirmed for Patient: {patientEntity.Name} (Serial: {ticketEntity.SerialNo})"
+                );
             }
             catch (Exception ex)
             {
@@ -109,6 +128,88 @@ namespace Service
                 return new ApiErrorResponse("Something Went Wrong", ex.Message);
             }
         }
+
+
+        //public async Task<ApiBaseResponse> PurchageTicketAsync(PurchageTicketDto purchaseTicket)
+        //{
+        //    var errorMessages = new List<string>();
+        //    var patientEntity = _mapper.Map<Patient>(purchaseTicket.patientDto);
+        //    var validationResultForPatient = await _patientValidator.ValidateAsync(patientEntity);
+
+        //    if (!validationResultForPatient.IsValid)
+        //    {
+        //        errorMessages.AddRange(validationResultForPatient.Errors.Select(e => e.ErrorMessage));
+        //    }
+
+        //    var ticketEntity = _mapper.Map<Ticket>(purchaseTicket.ticketDto);
+
+        //    if (ticketEntity.Amount == 0)
+        //    {
+        //        errorMessages.Add("Doctor fee is required");
+        //    }
+
+        //    if (errorMessages.Any())
+        //    {
+        //        return new ApiErrorResponse("Validation failed", errorMessages);
+        //    }
+
+        //    CancellationToken cancellationToken = default;
+        //    await _repository.BeginTransaction(cancellationToken);
+
+        //    try
+        //    {
+        //        patientEntity.PatientUniqueId = $"PAT{DateTime.Now:ddMMyyHHmmss}";
+        //        patientEntity.Status = true;
+        //        patientEntity.CreatedAt = DateTime.Now;
+        //        _repository.Patient.CreatePatient(patientEntity);
+        //        await _repository.SaveAsync();
+
+        //        ticketEntity.PatientId = patientEntity.Id;
+        //        ticketEntity.UniqueId = $"TKT{DateTime.Now:ddMMyyHHmmss}";
+        //        ticketEntity.Status = true;
+        //        ticketEntity.CreatedAt = DateTime.Now;
+
+        //        _repository.Ticket.CreateTicket(ticketEntity);
+        //        await _repository.SaveAsync();
+
+        //        var financialRecord = new FinancialRecord
+        //        {
+        //            FinancialType = (int)FinancialType.Income,
+        //            Income = ticketEntity.Amount - ticketEntity.Discount,
+        //            UniqueId = ticketEntity.UniqueId,
+        //            Purpose = $"From Ticket or Investigation UniqueId: {ticketEntity.UniqueId}",
+        //            Status = true,
+        //            RecordDate = DateTime.Now,
+        //            CreatedAt = DateTime.Now
+        //        };
+        //        _repository.FinancialRecord.CreateFinancialRecord(financialRecord);
+        //        await _repository.SaveAsync();
+        //        await _repository.CommitTransaction(cancellationToken);
+
+
+        //        var patientTicketDto = new PatientTicketDto
+        //        {
+        //            PatientUniqueId = patientEntity.PatientUniqueId,
+        //            Name = patientEntity.Name,
+        //            Gender = patientEntity.Gender,
+        //            Mobile = patientEntity.Mobile,
+        //            Age = patientEntity.Age,
+        //            Address = patientEntity.Address,
+        //            DoctorId = ticketEntity.DoctorId,
+        //            TicketUniqueId = ticketEntity.UniqueId,
+        //            Amount = ticketEntity.Amount,
+        //            Discount = ticketEntity.Discount,
+        //            CreatedAt = ticketEntity.CreatedAt
+        //        };
+
+        //        return new ApiOkResponse<PatientTicketDto>(patientTicketDto, $"Purchase Ticket confirmed for Patient: {patientEntity.Name}");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await _repository.Rollback(cancellationToken);
+        //        return new ApiErrorResponse("Something Went Wrong", ex.Message);
+        //    }
+        //}
 
         public async Task<ApiBaseResponse> PatientSearchByQuery(string? ticketId, string? patientName, string? mobileNo, string? doctorName, DateTime? startDate, DateTime? endDate)
         {

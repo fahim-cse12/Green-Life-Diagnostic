@@ -7,6 +7,7 @@ using FluentValidation;
 using LoggerService;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using Shared.Utility;
 
 namespace Service
 {
@@ -24,25 +25,73 @@ namespace Service
             _validator = validator;
         }
 
-        public async Task<ApiBaseResponse> CreateFinanceRecordAsync(FinanceRecordCreateDto financeRecordDto)
+        public async Task<ApiBaseResponse> CreateFinanceRecordAsync(FinanceRecordCreateDto dto)
         {
-            var financialRecordEntity = _mapper.Map<FinancialRecord>(financeRecordDto);
-            var validationResult = await _validator.ValidateAsync(financialRecordEntity);
+            var entity = new FinancialRecord
+            {
+                Id = Guid.NewGuid(),
+                RecordDate = dto.RecordDate,
+                UniqueId = $"FIN{DateTime.Now:ddMMyyHHmmss}",
+                Purpose = dto.Purpose,
+                FinancialType = (int)dto.FinancialType,
+                Status = true,
+                CreatedAt = DateTime.Now
+            };
 
+            // Set the correct property based on FinancialType
+            switch (dto.FinancialType)
+            {
+                case EnumValue.FinancialType.Income:
+                    entity.Income = dto.Amount;
+                    break;
+                case EnumValue.FinancialType.Expense:
+                    entity.Expense = dto.Amount;
+                    break;
+                case EnumValue.FinancialType.Asset:
+                    entity.Asset = dto.Amount;
+                    break;
+                case EnumValue.FinancialType.Liability:
+                    entity.Liability = dto.Amount;
+                    break;
+            }
+
+            var validationResult = await _validator.ValidateAsync(entity);
             if (!validationResult.IsValid)
             {
-                var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
-                return new ApiErrorResponse("Validation failed", errorMessages);
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return new ApiErrorResponse("Validation failed", errors);
             }
-            financialRecordEntity.UniqueId = $"FIN{DateTime.Now:ddMMyyHHmmss}";
-            financialRecordEntity.Status = true;
-            financialRecordEntity.CreatedAt = DateTime.Now;
-            _repository.FinancialRecord.CreateFinancialRecord(financialRecordEntity);
+
+            _repository.FinancialRecord.CreateFinancialRecord(entity);
             await _repository.SaveAsync();
 
-            var FinancialRecordToReturn = _mapper.Map<FinancialRecordDto>(financialRecordEntity);
+            var FinancialRecordToReturn = _mapper.Map<FinancialRecordDto>(entity);
+
             return new ApiOkResponse<FinancialRecordDto>(FinancialRecordToReturn, "FinancialRecord created successfully");
         }
+
+
+        //public async Task<ApiBaseResponse> CreateFinanceRecordAsync(FinanceRecordCreateDto financeRecordDto)
+        //{
+
+        //    var financialRecordEntity = _mapper.Map<FinancialRecord>(financeRecordDto);
+        //    var validationResult = await _validator.ValidateAsync(financialRecordEntity);
+
+        //    if (!validationResult.IsValid)
+        //    {
+        //        var errorMessages = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+        //        return new ApiErrorResponse("Validation failed", errorMessages);
+        //    }
+        //    financialRecordEntity.UniqueId = $"FIN{DateTime.Now:ddMMyyHHmmss}";
+        //    financialRecordEntity.Status = true;
+        //    financialRecordEntity.CreatedAt = DateTime.Now;
+        //    _repository.FinancialRecord.CreateFinancialRecord(financialRecordEntity);
+        //    await _repository.SaveAsync();
+
+        //    var FinancialRecordToReturn = _mapper.Map<FinancialRecordDto>(financialRecordEntity);
+        //    return new ApiOkResponse<FinancialRecordDto>(FinancialRecordToReturn, "FinancialRecord created successfully");
+        //}
+
 
         public async Task<ApiBaseResponse> DeleteFinanceRecordAsync(Guid financeRecordId, bool trackChanges)
         {
@@ -76,7 +125,35 @@ namespace Service
 
         public async Task<ApiBaseResponse> UpdateFinanceRecordAsync(Guid financeRecordId, FinanceRecordCreateDto financeRecordDto, bool trackChanges)
         {
-            var financialRecordEntity = _mapper.Map<FinancialRecord>(financeRecordDto);
+            // var financialRecordEntity = _mapper.Map<FinancialRecord>(financeRecordDto);
+            var financialRecordEntity = new FinancialRecord
+            {
+                Id = Guid.NewGuid(),
+                RecordDate = financeRecordDto.RecordDate,
+                UniqueId = $"FIN{DateTime.Now:ddMMyyHHmmss}",
+                Purpose = financeRecordDto.Purpose,
+                FinancialType = (int)financeRecordDto.FinancialType,
+                Status = true,
+                CreatedAt = DateTime.Now
+            };
+
+            // Set the correct property based on FinancialType
+            switch (financeRecordDto.FinancialType)
+            {
+                case EnumValue.FinancialType.Income:
+                    financialRecordEntity.Income = financeRecordDto.Amount;
+                    break;
+                case EnumValue.FinancialType.Expense:
+                    financialRecordEntity.Expense = financeRecordDto.Amount;
+                    break;
+                case EnumValue.FinancialType.Asset:
+                    financialRecordEntity.Asset = financeRecordDto.Amount;
+                    break;
+                case EnumValue.FinancialType.Liability:
+                    financialRecordEntity.Liability = financeRecordDto.Amount;
+                    break;
+            }
+
             var validationResult = await _validator.ValidateAsync(financialRecordEntity);
 
             if (!validationResult.IsValid)

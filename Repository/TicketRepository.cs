@@ -35,6 +35,11 @@ namespace Repository
             return await FindByCondition(x => x.Id.Equals(ticketId), trackChanges).SingleOrDefaultAsync();
         }
 
+        public IQueryable<Ticket> GetTicketsByCondition(Expression<Func<Ticket, bool>> condition, bool trackChanges)
+        {
+            return FindByCondition(condition, trackChanges);
+        }
+      
         public void UpdateTicket(Ticket ticket)
         {
             Update(ticket); 

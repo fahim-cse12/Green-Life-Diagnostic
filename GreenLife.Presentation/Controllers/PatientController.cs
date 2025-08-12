@@ -9,7 +9,7 @@ namespace GreenLife.Presentation.Controllers
     [Route("api/patient")]
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]
-    [Authorize]
+  //  [Authorize]
     public class PatientController : ApiControllerBase
     {
         private readonly IServiceManager _service;
