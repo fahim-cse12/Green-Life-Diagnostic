@@ -99,7 +99,9 @@ namespace GreenLife.Extentions
             var jwtConfiguration = new JwtConfiguration();
             configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
 
-            var secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
+          //  var secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
+            var secretKey = configuration["JwtConfiguration:SECRET_KEY"];
+
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
