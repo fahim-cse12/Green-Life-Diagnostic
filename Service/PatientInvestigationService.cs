@@ -264,6 +264,9 @@ namespace Service
                 return new ApiErrorResponse("Not Found", new List<string> { "Patient Investigation not found" });
             }
 
+            //patientInvestigation.InvestigationDetails = patientInvestigationUpdateDto.PatientInvestigationDetailUpdateDtos;
+            //patientInvestigation.CalculateFinancials(patientInvestigationUpdateDto.DiscountAmount);
+
             // Map the updated PatientInvestigation from DTO
             _mapper.Map(patientInvestigationUpdateDto, patientInvestigation);
             patientInvestigation.UpdatedAt = currentDate;
@@ -277,7 +280,7 @@ namespace Service
                 foreach (var detail in patientInvestigationUpdateDto.PatientInvestigationDetailUpdateDtos)
                 {
                     // For update on existing
-                    if (detail.PatientInvestigationDetailId != null)
+                    if (detail.PatientInvestigationDetailId != Guid.Empty)
                     {
                         var existingDetail = await _repository.InvestigationDetailsRepository.GetPatientInvestigationDetailById(detail.PatientInvestigationDetailId, false);
                         if (existingDetail != null)

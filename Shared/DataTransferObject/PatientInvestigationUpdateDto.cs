@@ -11,7 +11,7 @@
          string PatientMobileNo,
          string PatientAddress,
          decimal? PaidAmount,
-         decimal? DiscountAmount,
+         decimal DiscountAmount,
          string? DeliveryDate,
          bool  IsDelivered ,
     List<PatientInvestigationDetailUpdateDto> PatientInvestigationDetailUpdateDtos
