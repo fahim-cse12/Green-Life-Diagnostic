@@ -15,6 +15,6 @@ namespace Entities.Models
         public decimal Expense { get; set; }
         public decimal Asset { get; set; }
         public decimal Liability { get; set; }
-        public string AttachmentFileUrl { get; set; }
+        public string? AttachmentFileUrl { get; set; }
     }
 }

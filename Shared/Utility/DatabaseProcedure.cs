@@ -4,5 +4,6 @@
     {
         public static readonly string PatientSearchByQuery = "SP_SearchPatient";
         public static readonly string TicketDeleteQuery = "SP_DeletePurchasedTicket";
+        public static readonly string FinancialReportQuery = "SP_GetFinancialReport";
     }
 }

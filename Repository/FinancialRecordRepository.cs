@@ -25,10 +25,16 @@ namespace Repository
             return await FindByCondition(condition, trackChanges).SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<FinancialRecord>> GetAllFinancialRecordAsync(bool trackChanges) =>
-                                                       await FindAll(trackChanges).Where(i => i.Status == true)
-                                                       .OrderBy(c => c.CreatedAt)
-                                                       .ToListAsync();
+        public async Task<IEnumerable<FinancialRecord>> GetAllFinancialRecordAsync(bool trackChanges)
+        {
+            var financialRecord = await FindAll(trackChanges)
+                .Where(i => i.Status && !i.Purpose.Contains("From Ticket or Investigation UniqueId"))
+                .OrderBy(c => c.CreatedAt)
+                .ToListAsync();
+
+            return financialRecord;
+        }
+
 
         public async Task<FinancialRecord> GetFinancialRecordAsync(Guid financialRecordId, bool trackChanges)
         {
