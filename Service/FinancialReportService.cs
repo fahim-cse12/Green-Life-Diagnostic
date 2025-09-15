@@ -47,14 +47,14 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
             : new ApiOkResponse<IEnumerable<AppointmentWiseIncomeDto>>(result, "Appointment income data retrieved successfully");
     }
 
-    public async Task<ApiBaseResponse> TestWiseIncomeReportAsync(DateTime? fromDate, DateTime? toDate, Guid? investigationId, Guid? patientId)
+    public async Task<ApiBaseResponse> TestWiseIncomeReportAsync(DateTime? fromDate, DateTime? toDate, Guid? investigationId, string? patientName)
     {
         var parameters = new List<SqlParameter>
         {
             new SqlParameter("@FromDate", fromDate ?? (object)DBNull.Value),
             new SqlParameter("@ToDate", toDate ?? (object)DBNull.Value),
             new SqlParameter("@InvestigationId", investigationId ?? (object)DBNull.Value),
-            new SqlParameter("@PatientId", patientId ?? (object)DBNull.Value)
+            new SqlParameter("@PatientName", patientName ?? (object)DBNull.Value)
         };
 
         var result = await repository.ExecuteStoredProcedureToGetData<TestWiseIncomeReportDto>("Sp_TestWiseIncomeReport", parameters).ToListAsync();

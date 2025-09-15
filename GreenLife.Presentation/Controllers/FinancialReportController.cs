@@ -46,9 +46,9 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
         DateTime? fromDate,
         DateTime? toDate,
         Guid? investigationId,
-        Guid? patientId)
+        string? patientName)
     {
-        var response = await serviceManager.FinancialReportService.TestWiseIncomeReportAsync(fromDate, toDate, investigationId, patientId);
+        var response = await serviceManager.FinancialReportService.TestWiseIncomeReportAsync(fromDate, toDate, investigationId, patientName);
 
         if (response is ApiErrorResponse errorResponse)
             return BadRequest(new { errorResponse.Message, errorResponse.Errors });

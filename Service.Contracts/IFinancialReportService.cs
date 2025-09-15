@@ -10,5 +10,5 @@ public interface IFinancialReportService
 {
     //Task<ApiBaseResponse> FinancialReportSearchByQuery(DateTime? startDate, DateTime? endDate, Guid? doctorId);
     Task<ApiBaseResponse> AppointmentWiseIncomeAsync(DateTime? fromDate, DateTime? toDate, Guid? doctorId, bool? patientType, int? patientAge);
-    Task<ApiBaseResponse> TestWiseIncomeReportAsync(DateTime? fromDate, DateTime? toDate, Guid? investigationId, Guid? patientId);
+    Task<ApiBaseResponse> TestWiseIncomeReportAsync(DateTime? fromDate, DateTime? toDate, Guid? investigationId, string patientName);
 }
