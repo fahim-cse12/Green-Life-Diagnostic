@@ -8,4 +8,5 @@ public class AppointmentWiseIncomeDto : INonEntityBase
     public bool IsNewPatient { get; set; }
     public decimal DoctorFee { get; set; }
     public decimal DiscountAmount { get; set; }
+    public int TotalRecords { get; set; }
 }

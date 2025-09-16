@@ -29,7 +29,14 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
 
     //    return !result.Any() ? new ApiOkResponse<IEnumerable<FinancialReportDto>>([], "Data not found") : new ApiOkResponse<IEnumerable<FinancialReportDto>>(result, "Patients retrieved successfully");
     //}
-    public async Task<ApiBaseResponse> AppointmentWiseIncomeAsync(DateTime? fromDate, DateTime? toDate, Guid? doctorId, bool? patientType, int? patientAge)
+    public async Task<ApiBaseResponse> AppointmentWiseIncomeAsync(
+        DateTime? fromDate,
+        DateTime? toDate,
+        Guid? doctorId,
+        bool? patientType,
+        int? patientAge,
+        int pageNumber,
+        int pageSize)
     {
         var parameters = new List<SqlParameter>
         {
@@ -37,30 +44,52 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
             new SqlParameter("@ToDate", toDate ?? (object)DBNull.Value),
             new SqlParameter("@DoctorId", doctorId ?? (object)DBNull.Value),
             new SqlParameter("@PatientType", patientType.HasValue ? (object)patientType.Value : DBNull.Value),
-            new SqlParameter("@PatientAge", patientAge ?? (object)DBNull.Value)
+            new SqlParameter("@PatientAge", patientAge ?? (object)DBNull.Value),
+            new SqlParameter("@PageNumber", pageNumber),
+            new SqlParameter("@PageSize", pageSize)
         };
 
-        var result = await repository.ExecuteStoredProcedureToGetData<AppointmentWiseIncomeDto>("Sp_AppointmentWiseIncome", parameters).ToListAsync();
+        var result = await repository.ExecuteStoredProcedureToGetData<AppointmentWiseIncomeDto>(
+            "Sp_AppointmentWiseIncome", parameters).ToListAsync();
 
-        return !result.Any()
-            ? new ApiOkResponse<IEnumerable<AppointmentWiseIncomeDto>>([], "No appointment income data found")
-            : new ApiOkResponse<IEnumerable<AppointmentWiseIncomeDto>>(result, "Appointment income data retrieved successfully");
+        if (!result.Any())
+            return new ApiOkResponse<IEnumerable<AppointmentWiseIncomeDto>>([], "No appointment income data found");
+
+        var totalRecords = result.First().TotalRecords;
+
+        return new PagedApiResponse<IEnumerable<AppointmentWiseIncomeDto>>(
+            result, totalRecords, pageNumber, pageSize, "Appointment income data retrieved successfully");
     }
 
-    public async Task<ApiBaseResponse> TestWiseIncomeReportAsync(DateTime? fromDate, DateTime? toDate, Guid? investigationId, string? patientName)
+
+    public async Task<ApiBaseResponse> TestWiseIncomeReportAsync(
+        DateTime? fromDate,
+        DateTime? toDate,
+        Guid? investigationId,
+        string? patientName,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
         var parameters = new List<SqlParameter>
         {
             new SqlParameter("@FromDate", fromDate ?? (object)DBNull.Value),
             new SqlParameter("@ToDate", toDate ?? (object)DBNull.Value),
             new SqlParameter("@InvestigationId", investigationId ?? (object)DBNull.Value),
-            new SqlParameter("@PatientName", patientName ?? (object)DBNull.Value)
+            new SqlParameter("@PatientName", patientName ?? (object)DBNull.Value),
+            new SqlParameter("@PageNumber", pageNumber),
+            new SqlParameter("@PageSize", pageSize)
         };
 
-        var result = await repository.ExecuteStoredProcedureToGetData<TestWiseIncomeReportDto>("Sp_TestWiseIncomeReport", parameters).ToListAsync();
+        var result = await repository.ExecuteStoredProcedureToGetData<TestWiseIncomeReportDto>(
+            "Sp_TestWiseIncomeReport", parameters).ToListAsync();
 
-        return !result.Any()
-            ? new ApiOkResponse<IEnumerable<TestWiseIncomeReportDto>>([], "No test income data found")
-            : new ApiOkResponse<IEnumerable<TestWiseIncomeReportDto>>(result, "Test income data retrieved successfully");
+        if (!result.Any())
+            return new ApiOkResponse<IEnumerable<TestWiseIncomeReportDto>>([], "No test income data found");
+
+        var totalRecords = result.First().TotalRecords;
+
+        return new PagedApiResponse<IEnumerable<TestWiseIncomeReportDto>>(
+            result, totalRecords, pageNumber, pageSize, "Test income data retrieved successfully");
     }
+
 }

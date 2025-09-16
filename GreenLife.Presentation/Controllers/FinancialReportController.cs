@@ -31,28 +31,40 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
         DateTime? toDate,
         Guid? doctorId,
         bool? patientType,
-        int? patientAge)
+        int? patientAge,
+        int pageNumber = 1,
+        int pageSize = 10)
     {
-        var response = await serviceManager.FinancialReportService.AppointmentWiseIncomeAsync(fromDate, toDate, doctorId, patientType, patientAge);
+        if (pageNumber <= 0) pageNumber = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        var response = await serviceManager.FinancialReportService
+            .AppointmentWiseIncomeAsync(fromDate, toDate, doctorId, patientType, patientAge, pageNumber, pageSize);
 
         if (response is ApiErrorResponse errorResponse)
             return BadRequest(new { errorResponse.Message, errorResponse.Errors });
 
         return Ok(response);
     }
-
     [HttpGet("test-wise-income")]
     public async Task<IActionResult> TestWiseIncomeReport(
-        DateTime? fromDate,
-        DateTime? toDate,
-        Guid? investigationId,
-        string? patientName)
+    DateTime? fromDate,
+    DateTime? toDate,
+    Guid? investigationId,
+    string? patientName,
+    int pageNumber = 1,
+    int pageSize = 10)
     {
-        var response = await serviceManager.FinancialReportService.TestWiseIncomeReportAsync(fromDate, toDate, investigationId, patientName);
+        if (pageNumber <= 0) pageNumber = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        var response = await serviceManager.FinancialReportService
+            .TestWiseIncomeReportAsync(fromDate, toDate, investigationId, patientName, pageNumber, pageSize);
 
         if (response is ApiErrorResponse errorResponse)
             return BadRequest(new { errorResponse.Message, errorResponse.Errors });
 
         return Ok(response);
     }
+
 }
