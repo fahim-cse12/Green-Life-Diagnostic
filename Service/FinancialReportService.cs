@@ -51,14 +51,13 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
 
         var result = await repository.ExecuteStoredProcedureToGetData<AppointmentWiseIncomeDto>(
             "Sp_AppointmentWiseIncome", parameters).ToListAsync();
-
-        if (!result.Any())
-            return new ApiOkResponse<IEnumerable<AppointmentWiseIncomeDto>>([], "No appointment income data found");
-
+        
         var totalRecords = result.First().TotalRecords;
 
-        return new PagedApiResponse<IEnumerable<AppointmentWiseIncomeDto>>(
-            result, totalRecords, pageNumber, pageSize, "Appointment income data retrieved successfully");
+
+        return !result.Any() ? new PagedApiResponse<IEnumerable<AppointmentWiseIncomeDto>>([], totalRecords,"Data not found") 
+            : new PagedApiResponse<IEnumerable<AppointmentWiseIncomeDto>>(result,totalRecords, "Appointment income data retrieved successfully");
+
     }
 
 
@@ -82,14 +81,12 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
 
         var result = await repository.ExecuteStoredProcedureToGetData<TestWiseIncomeReportDto>(
             "Sp_TestWiseIncomeReport", parameters).ToListAsync();
-
-        if (!result.Any())
-            return new ApiOkResponse<IEnumerable<TestWiseIncomeReportDto>>([], "No test income data found");
-
+        
         var totalRecords = result.First().TotalRecords;
 
-        return new PagedApiResponse<IEnumerable<TestWiseIncomeReportDto>>(
-            result, totalRecords, pageNumber, pageSize, "Test income data retrieved successfully");
+        return !result.Any() ? new PagedApiResponse<IEnumerable<TestWiseIncomeReportDto>>([], totalRecords, "Data not found")
+            : new PagedApiResponse<IEnumerable<TestWiseIncomeReportDto>>(result, totalRecords, "Test income data retrieved successfully");
+
     }
 
 }
