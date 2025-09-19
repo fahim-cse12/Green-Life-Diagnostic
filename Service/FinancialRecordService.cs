@@ -35,6 +35,7 @@ namespace Service
                 Purpose = dto.Purpose,
                 FinancialType = (int)dto.FinancialType,
                 Status = true,
+                AttachmentFileUrl = dto.AttachmentFileUrl,
                 CreatedAt = DateTime.Now
             };
 

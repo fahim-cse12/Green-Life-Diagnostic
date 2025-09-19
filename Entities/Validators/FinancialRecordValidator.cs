@@ -10,8 +10,16 @@ namespace Entities.Validators
             RuleFor(record => record.Purpose).NotEmpty().WithMessage("Purpose is required.")
                                              .Length(1, 250).WithMessage("Purpose must be between 1 and 250 characters.");
 
-            RuleFor(record => record).Must(record => record.Income != 0 || record.Expense != 0)
-                                     .WithMessage("Either Income or Expense must be non-zero.");
+            //RuleFor(record => record).Must(record => record.Income != 0 || record.Expense != 0)
+            //                         .WithMessage("Either Income or Expense must be non-zero.");
+
+            RuleFor(record => record)
+                .Must(r =>
+                    r.Income > 0 ||
+                    r.Expense > 0 ||
+                    r.Asset > 0 ||
+                    r.Liability > 0)
+                .WithMessage("Amount must be greater than zero.");
         }
     }
 }
