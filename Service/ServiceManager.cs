@@ -24,6 +24,7 @@ namespace Service
         private readonly Lazy<IFinancialReportService> _financialReportService;
         private readonly Lazy<IUserService> _userService;
         private readonly Lazy<IAuthenticationService> _authenticationService;
+        private readonly Lazy<IDashboardService> _dashboardService;
         private readonly IOptions<JwtConfiguration> _configuration;
         private readonly JwtConfiguration _jwtConfiguration;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -64,7 +65,9 @@ namespace Service
                 mapper,
                 serviceProvider.GetRequiredService<IValidator<FinancialRecord>>()));
             _financialReportService = new Lazy<IFinancialReportService>(() => new FinancialReportService(
-                repositoryManager ));
+                repositoryManager)); 
+            _dashboardService = new Lazy<IDashboardService>(() => new DashboardService(
+                repositoryManager));
 
             _userService = new Lazy<IUserService>(() => new UserService(repositoryManager, logger, mapper));
             _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration));
@@ -78,10 +81,9 @@ namespace Service
         public IInvestigationService investigationService => _investigationService.Value; 
         public ITicketService ticketService => _ticketService.Value;
         public IFinancialService financialService => _financialService.Value;
-        public IFinancialReportService FinancialReportService => _financialReportService.Value;
+        public IFinancialReportService financialReportService => _financialReportService.Value;
         public IUserService userService => _userService.Value;  
         public IAuthenticationService authenticationService => _authenticationService.Value;
-
-        
+        public IDashboardService dashboardService => _dashboardService.Value;
     }
 }

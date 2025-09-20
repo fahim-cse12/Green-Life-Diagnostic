@@ -13,18 +13,6 @@ namespace GreenLife.Presentation.Controllers;
 [ApiExplorerSettings(GroupName = "v1")]
 public class FinancialReportController (IServiceManager serviceManager) : ApiControllerBase
 {
-    //[HttpGet(Name = "FinancialReportSearch")]
-    //public async Task<IActionResult> FinancialReportSearch(DateTime? startDate, DateTime? endDate, Guid? doctorId)
-    //{
-    //    var response = await serviceManager.FinancialReportService.FinancialReportSearchByQuery( startDate,endDate, doctorId);
-
-    //    if (response is ApiErrorResponse errorResponse)
-    //    {
-    //        return BadRequest(new { errorResponse.Message, errorResponse.Errors });
-    //    }
-
-    //    return Created("", response);
-    //}
     [HttpGet("appointment-wise-income")]
     public async Task<IActionResult> AppointmentWiseIncome(
         DateTime? fromDate,
@@ -38,7 +26,7 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var response = await serviceManager.FinancialReportService
+        var response = await serviceManager.financialReportService
             .AppointmentWiseIncomeAsync(fromDate, toDate, doctorId, patientType, patientAge, pageNumber, pageSize);
 
         if (response is ApiErrorResponse errorResponse)
@@ -58,7 +46,7 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
         if (pageNumber <= 0) pageNumber = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        var response = await serviceManager.FinancialReportService
+        var response = await serviceManager.financialReportService
             .TestWiseIncomeReportAsync(fromDate, toDate, investigationId, patientName, pageNumber, pageSize);
 
         if (response is ApiErrorResponse errorResponse)

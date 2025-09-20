@@ -15,20 +15,6 @@ using Shared.Utility;
 namespace Service;
 public class FinancialReportService(IRepositoryManager repository) : IFinancialReportService
 {
-    //public async Task<ApiBaseResponse> FinancialReportSearchByQuery(DateTime? startDate, DateTime? endDate, Guid? doctorId)
-    //{
-    //    string sp = DatabaseProcedure.FinancialReportQuery;
-    //    var parameters = new List<SqlParameter>
-    //    {
-    //        new SqlParameter("@StartDate", startDate.HasValue ? (object)startDate.Value : DBNull.Value),
-    //        new SqlParameter("@EndDate", endDate.HasValue ? (object)endDate.Value : DBNull.Value),
-    //        new SqlParameter("@DoctorId", doctorId.HasValue ? (object)doctorId.Value : DBNull.Value)
-    //    };
-
-    //    var result = await repository.ExecuteStoredProcedureToGetData<FinancialReportDto>(sp, parameters).ToListAsync();
-
-    //    return !result.Any() ? new ApiOkResponse<IEnumerable<FinancialReportDto>>([], "Data not found") : new ApiOkResponse<IEnumerable<FinancialReportDto>>(result, "Patients retrieved successfully");
-    //}
     public async Task<ApiBaseResponse> AppointmentWiseIncomeAsync(
         DateTime? fromDate,
         DateTime? toDate,
@@ -38,6 +24,8 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
         int pageNumber,
         int pageSize)
     {
+        string sp = DatabaseProcedure.AppointmentWiseIncomeQuery;
+
         var parameters = new List<SqlParameter>
         {
             new SqlParameter("@FromDate", fromDate ?? (object)DBNull.Value),
@@ -50,7 +38,7 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
         };
 
         var result = await repository.ExecuteStoredProcedureToGetData<AppointmentWiseIncomeDto>(
-            "Sp_AppointmentWiseIncome", parameters).ToListAsync();
+            sp, parameters).ToListAsync();
         
         var totalRecords = result.First().TotalRecords;
 
@@ -69,6 +57,8 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
         int pageNumber = 1,
         int pageSize = 10)
     {
+        string sp = DatabaseProcedure.TestWiseIncomeReportQuery;
+
         var parameters = new List<SqlParameter>
         {
             new SqlParameter("@FromDate", fromDate ?? (object)DBNull.Value),
@@ -80,7 +70,7 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
         };
 
         var result = await repository.ExecuteStoredProcedureToGetData<TestWiseIncomeReportDto>(
-            "Sp_TestWiseIncomeReport", parameters).ToListAsync();
+            sp, parameters).ToListAsync();
         
         var totalRecords = result.First().TotalRecords;
 

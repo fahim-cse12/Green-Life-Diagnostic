@@ -8,8 +8,9 @@
         IInvestigationService investigationService { get; }
         ITicketService ticketService { get; }   
         IFinancialService financialService { get; }
-        IFinancialReportService FinancialReportService { get; }
+        IFinancialReportService financialReportService { get; }
         IUserService userService { get; }
         IAuthenticationService authenticationService { get; }
+        IDashboardService dashboardService { get; }
     }
 }
