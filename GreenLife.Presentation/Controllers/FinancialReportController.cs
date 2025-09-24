@@ -15,8 +15,8 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
 {
     [HttpGet("appointment-wise-income")]
     public async Task<IActionResult> AppointmentWiseIncome(
-        DateTime? fromDate,
-        DateTime? toDate,
+        DateOnly? fromDate,
+        DateOnly? toDate,
         Guid? doctorId,
         bool? patientType,
         int? patientAge,
@@ -36,8 +36,8 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
     }
     [HttpGet("test-wise-income")]
     public async Task<IActionResult> TestWiseIncomeReport(
-    DateTime? fromDate,
-    DateTime? toDate,
+    DateOnly? fromDate,
+    DateOnly? toDate,
     Guid? investigationId,
     string? patientName,
     int pageNumber = 1,

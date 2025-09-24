@@ -14,4 +14,6 @@ public class DashboardData :INonEntityBase
     public int TodayTickets { get; set; }
     public decimal? TodayIncome { get; set; }
     public decimal? TodayExpense { get; set; }
+    public int TodayPendingTests { get; set; }
+    public int TodayDeliveredTests { get; set; }
 }

@@ -16,8 +16,8 @@ namespace Service;
 public class FinancialReportService(IRepositoryManager repository) : IFinancialReportService
 {
     public async Task<ApiBaseResponse> AppointmentWiseIncomeAsync(
-        DateTime? fromDate,
-        DateTime? toDate,
+        DateOnly? fromDate,
+        DateOnly? toDate,
         Guid? doctorId,
         bool? patientType,
         int? patientAge,
@@ -50,8 +50,8 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
 
 
     public async Task<ApiBaseResponse> TestWiseIncomeReportAsync(
-        DateTime? fromDate,
-        DateTime? toDate,
+        DateOnly? fromDate,
+        DateOnly? toDate,
         Guid? investigationId,
         string? patientName,
         int pageNumber = 1,
