@@ -211,7 +211,7 @@ namespace Service
         //    }
         //}
 
-        public async Task<ApiBaseResponse> PatientSearchByQuery(string? ticketId, string? patientName, string? mobileNo, string? doctorName, DateTime? startDate, DateTime? endDate)
+        public async Task<ApiBaseResponse> PatientSearchByQuery(string? ticketId, string? patientName, string? mobileNo, string? doctorName, DateOnly? startDate, DateOnly? endDate)
         {
             string sp = DatabaseProcedure.PatientSearchByQuery;
             var parameters = new List<SqlParameter>

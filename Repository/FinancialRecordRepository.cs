@@ -29,7 +29,7 @@ namespace Repository
         {
             var financialRecord = await FindAll(trackChanges)
                 .Where(i => i.Status && !i.Purpose.Contains("From Ticket or Investigation UniqueId"))
-                .OrderBy(c => c.CreatedAt)
+                .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();
 
             return financialRecord;

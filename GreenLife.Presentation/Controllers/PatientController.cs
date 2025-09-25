@@ -32,7 +32,7 @@ namespace GreenLife.Presentation.Controllers
         }
 
         [HttpGet(Name = "patientsearch")]
-        public async Task<IActionResult> PatientSearchByQeuery(string? ticketId, string? patientName, string? mobileNo, string? doctorName, DateTime? startDate, DateTime? endDate)
+        public async Task<IActionResult> PatientSearchByQeuery(string? ticketId, string? patientName, string? mobileNo, string? doctorName, DateOnly? startDate, DateOnly? endDate)
         {
             var response = await _service.patientService.PatientSearchByQuery(ticketId, patientName, mobileNo, doctorName, startDate, endDate);
 
