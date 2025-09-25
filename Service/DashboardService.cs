@@ -15,7 +15,7 @@ using Entities.NonDbEntities;
 namespace Service;
 public class DashboardService (IRepositoryManager repository) : IDashboardService
 {
-    public async Task<ApiBaseResponse> GetDashboardDataAsync(DateTime? startDate, DateTime? endDate)
+    public async Task<ApiBaseResponse> GetDashboardDataAsync(DateOnly? startDate, DateOnly? endDate)
     {
         string sp = DatabaseProcedure.DashboardQuery;   
 

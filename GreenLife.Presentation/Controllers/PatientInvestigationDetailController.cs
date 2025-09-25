@@ -1,9 +1,11 @@
 ﻿using Entities.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 
 namespace GreenLife.Presentation.Controllers
 {
+    [Authorize]
     [Route("api/patientinvestigationdetail")]
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]

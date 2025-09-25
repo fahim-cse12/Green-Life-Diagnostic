@@ -9,5 +9,5 @@ using Entities.Responses;
 namespace Service.Contracts;
 public interface IDashboardService
 {
-    Task<ApiBaseResponse> GetDashboardDataAsync(DateTime? startDate, DateTime? endDate);
+    Task<ApiBaseResponse> GetDashboardDataAsync(DateOnly? startDate, DateOnly? endDate);
 }

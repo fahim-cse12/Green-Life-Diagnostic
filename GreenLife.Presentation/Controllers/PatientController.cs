@@ -6,10 +6,10 @@ using Shared.DataTransferObject;
 
 namespace GreenLife.Presentation.Controllers
 {
+    [Authorize]
     [Route("api/patient")]
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]
-  //  [Authorize]
     public class PatientController : ApiControllerBase
     {
         private readonly IServiceManager _service;

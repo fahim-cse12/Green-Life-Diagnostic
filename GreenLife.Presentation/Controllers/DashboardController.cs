@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Entities.Responses;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Service.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Entities.Responses;
-using Microsoft.AspNetCore.Mvc;
-using Service.Contracts;
 
 namespace GreenLife.Presentation.Controllers;
+[Authorize]
 [Route("api/dashboard")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "v1")]
@@ -15,7 +17,7 @@ public class DashboardController(IServiceManager serviceManager) : ApiController
 {
     [HttpGet("data")]
     public async Task<IActionResult> GetDashboardData(
-        DateTime? startDate, DateTime? endDate)
+        DateOnly? startDate, DateOnly? endDate)
     {
         var response = await serviceManager.dashboardService.GetDashboardDataAsync(startDate, endDate);
 

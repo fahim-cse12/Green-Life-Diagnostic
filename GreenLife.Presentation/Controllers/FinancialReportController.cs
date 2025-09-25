@@ -1,4 +1,5 @@
 ﻿using Entities.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using System;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace GreenLife.Presentation.Controllers;
+[Authorize]
 [Route("api/financialReport")]
 [ApiController]
 [ApiExplorerSettings(GroupName = "v1")]
