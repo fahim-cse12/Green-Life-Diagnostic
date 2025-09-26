@@ -98,7 +98,25 @@ namespace Service
                 await _repository.CommitTransaction(cancellationToken);
 
                 // Map to DTO
+               // patientInvestigation.InvestigationDetails = detailList;
+
                 var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+
+                patientInvestigationDto.InvestigationDetails = [];
+
+
+                foreach (var inv in patientInvestigation.InvestigationDetails)
+                {
+                    var invDetails = _repository.Investigation.GetInvestigationAsync(inv.InvestigationId, false).Result;
+                    var detailsResponseDto = new PatientInvestigationDetailDto
+                    {
+                        InvestigationId = invDetails.Id,
+                        InvestigationName = invDetails.InvestigationName,
+                        PaymentAmount = invDetails.Cost
+                    };
+
+                    patientInvestigationDto.InvestigationDetails.Add(detailsResponseDto);
+                }
                 //Save financial record
                 SaveFinancialRecord(patientInvestigationDto.PaidAmount, patientInvestigationDto.PatientInvestigationUniqueId);
 
