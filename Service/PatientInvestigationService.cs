@@ -102,6 +102,15 @@ namespace Service
 
                 var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
 
+                // Ensure DoctorId is not null before accessing it
+                if (patientInvestigationDto.DoctorId.HasValue)
+                {
+                    patientInvestigationDto.DoctorName = _repository.Doctor.GetDoctorAsync(patientInvestigationDto.DoctorId.Value, false).Result.Name;
+                }
+                else
+                {
+                    patientInvestigationDto.DoctorName = "Unknown Doctor";
+                }
                 patientInvestigationDto.InvestigationDetails = [];
 
 

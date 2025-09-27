@@ -5,6 +5,7 @@
         public Guid PatientInvestigationId { get; set; }
         public string? PatientUniqueId { get; set; }
         public Guid? DoctorId { get; set; }
+        public string DoctorName { get; set; }
         public string PatientInvestigationUniqueId { get; set; }
         public string PatientName { get; set; }
         public int PatientAge { get; set; }
