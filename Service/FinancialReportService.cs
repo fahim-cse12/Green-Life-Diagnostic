@@ -21,6 +21,7 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
         Guid? doctorId,
         bool? patientType,
         int? patientAge,
+        string ticketUniqueId,
         int pageNumber,
         int pageSize)
     {
@@ -33,6 +34,7 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
             new SqlParameter("@DoctorId", doctorId ?? (object)DBNull.Value),
             new SqlParameter("@PatientType", patientType.HasValue ? (object)patientType.Value : DBNull.Value),
             new SqlParameter("@PatientAge", patientAge ?? (object)DBNull.Value),
+            new SqlParameter("@TicketUniqueId", ticketUniqueId ?? (object)DBNull.Value),
             new SqlParameter("@PageNumber", pageNumber),
             new SqlParameter("@PageSize", pageSize)
         };

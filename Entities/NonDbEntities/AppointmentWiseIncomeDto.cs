@@ -2,6 +2,7 @@
 public class AppointmentWiseIncomeDto : INonEntityBase
 {
     public DateTime AppointmentDate { get; set; }
+    public string TicketId { get; set; }
     public string DoctorName { get; set; }
     public string PatientName { get; set; }
     public int Age { get; set; }

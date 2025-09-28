@@ -22,6 +22,7 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
         Guid? doctorId,
         bool? patientType,
         int? patientAge,
+        string? ticketUniqueId,
         int pageNumber = 1,
         int pageSize = 10)
     {
@@ -29,7 +30,7 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
         if (pageSize <= 0) pageSize = 10;
 
         var response = await serviceManager.financialReportService
-            .AppointmentWiseIncomeAsync(fromDate, toDate, doctorId, patientType, patientAge, pageNumber, pageSize);
+            .AppointmentWiseIncomeAsync(fromDate, toDate, doctorId, patientType, patientAge, ticketUniqueId, pageNumber, pageSize);
 
         if (response is ApiErrorResponse errorResponse)
             return BadRequest(new { errorResponse.Message, errorResponse.Errors });
