@@ -2,6 +2,7 @@
 public class TestWiseIncomeReportDto : INonEntityBase
 {
     public DateOnly TestDate { get; set; }
+    public string? Id { get; set; }
     public string PatientName { get; set; }
     public int PatientAge { get; set; }
     public string? DoctorName { get; set; }

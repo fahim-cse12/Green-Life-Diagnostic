@@ -54,6 +54,7 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
     public async Task<ApiBaseResponse> TestWiseIncomeReportAsync(
         DateOnly? fromDate,
         DateOnly? toDate,
+        string? patientInvestigationId,
         Guid? investigationId,
         string? patientName,
         int pageNumber = 1,
@@ -67,6 +68,7 @@ public class FinancialReportService(IRepositoryManager repository) : IFinancialR
             new SqlParameter("@ToDate", toDate ?? (object)DBNull.Value),
             new SqlParameter("@InvestigationId", investigationId ?? (object)DBNull.Value),
             new SqlParameter("@PatientName", patientName ?? (object)DBNull.Value),
+            new SqlParameter("@PatientInvestigationUniqueId", patientInvestigationId ?? (object)DBNull.Value),
             new SqlParameter("@PageNumber", pageNumber),
             new SqlParameter("@PageSize", pageSize)
         };

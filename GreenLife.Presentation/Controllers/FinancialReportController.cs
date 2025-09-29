@@ -43,6 +43,7 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
     DateOnly? toDate,
     Guid? investigationId,
     string? patientName,
+    string? patientInvestigationId,
     int pageNumber = 1,
     int pageSize = 10)
     {
@@ -50,7 +51,7 @@ public class FinancialReportController (IServiceManager serviceManager) : ApiCon
         if (pageSize <= 0) pageSize = 10;
 
         var response = await serviceManager.financialReportService
-            .TestWiseIncomeReportAsync(fromDate, toDate, investigationId, patientName, pageNumber, pageSize);
+            .TestWiseIncomeReportAsync(fromDate, toDate, patientInvestigationId, investigationId, patientName, pageNumber, pageSize);
 
         if (response is ApiErrorResponse errorResponse)
             return BadRequest(new { errorResponse.Message, errorResponse.Errors });
