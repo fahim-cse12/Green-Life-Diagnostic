@@ -98,9 +98,36 @@ namespace Service
                 await _repository.CommitTransaction(cancellationToken);
 
                 // Map to DTO
+                // patientInvestigation.InvestigationDetails = detailList;
+
                 var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+
+                // Ensure DoctorId is not null before accessing it
+                if (patientInvestigationDto.DoctorId.HasValue)
+                {
+                    patientInvestigationDto.DoctorName = _repository.Doctor.GetDoctorAsync(patientInvestigationDto.DoctorId.Value, false).Result.Name;
+                }
+                else
+                {
+                    patientInvestigationDto.DoctorName = "Unknown Doctor";
+                }
+                patientInvestigationDto.InvestigationDetails = [];
+
+
+                foreach (var inv in patientInvestigation.InvestigationDetails)
+                {
+                    var invDetails = _repository.Investigation.GetInvestigationAsync(inv.InvestigationId, false).Result;
+                    var detailsResponseDto = new PatientInvestigationDetailDto
+                    {
+                        InvestigationId = invDetails.Id,
+                        InvestigationName = invDetails.InvestigationName,
+                        PaymentAmount = invDetails.Cost
+                    };
+
+                    patientInvestigationDto.InvestigationDetails.Add(detailsResponseDto);
+                }
                 //Save financial record
-                SaveFinancialRecord(patientInvestigationDto.PaidAmount, patientInvestigationDto.PatientInvestigationUniqueId);
+               await SaveFinancialRecord(patientInvestigationDto.PaidAmount, patientInvestigationDto.PatientInvestigationUniqueId);
 
                 return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, "Patient Investigation Created Successfully");
             }
@@ -268,12 +295,26 @@ namespace Service
             //patientInvestigation.CalculateFinancials(patientInvestigationUpdateDto.DiscountAmount);
 
             // Map the updated PatientInvestigation from DTO
+
+
+            patientInvestigationUpdateDto.TotalAmount = patientInvestigationUpdateDto.PatientInvestigationDetailUpdateDtos.Sum(x => x.PaymentAmount);
+
+            patientInvestigationUpdateDto.DiscountAmount = patientInvestigation.TotalAmount * (patientInvestigationUpdateDto.DiscountAmount / 100);
+
+            patientInvestigationUpdateDto.PaidAmount += patientInvestigation.PaidAmount;
+            patientInvestigationUpdateDto.DueAmount = patientInvestigation.TotalAmount - patientInvestigationUpdateDto.PaidAmount - patientInvestigationUpdateDto.DiscountAmount;
+            if (patientInvestigationUpdateDto.DueAmount < 1)
+                patientInvestigationUpdateDto.DueAmount = 0;
+
             _mapper.Map(patientInvestigationUpdateDto, patientInvestigation);
+
             patientInvestigation.UpdatedAt = currentDate;
+
 
             await _repository.BeginTransaction(cancellationToken);
             try
             {
+
                 _repository.PatientInvestigation.UpdatePatientInvestigation(patientInvestigation);
                
 
@@ -321,7 +362,33 @@ namespace Service
                 // Map to DTO and return success response
                 var patientInvestigationDtoResult = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
 
-                SaveFinancialRecord(patientInvestigationDtoResult.TotalAmount, patientInvestigationDtoResult.PatientInvestigationUniqueId);
+
+                // Ensure DoctorId is not null before accessing it
+                if (patientInvestigationDtoResult.DoctorId.HasValue)
+                {
+                    patientInvestigationDtoResult.DoctorName = _repository.Doctor.GetDoctorAsync(patientInvestigationDtoResult.DoctorId.Value, false).Result.Name;
+                }
+                else
+                {
+                    patientInvestigationDtoResult.DoctorName = "Unknown Doctor";
+                }
+                patientInvestigationDtoResult.InvestigationDetails = [];
+
+
+                foreach (var inv in patientInvestigation.InvestigationDetails)
+                {
+                    var invDetails = _repository.Investigation.GetInvestigationAsync(inv.InvestigationId, false).Result;
+                    var detailsResponseDto = new PatientInvestigationDetailDto
+                    {
+                        InvestigationId = invDetails.Id,
+                        InvestigationName = invDetails.InvestigationName,
+                        PaymentAmount = invDetails.Cost
+                    };
+
+                    patientInvestigationDtoResult.InvestigationDetails.Add(detailsResponseDto);
+                }
+
+                SaveFinancialRecord(patientInvestigationDtoResult.PaidAmount, patientInvestigationDtoResult.PatientInvestigationUniqueId);
 
                 return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDtoResult, "Patient Investigation Updated Successfully");
             }
@@ -342,6 +409,14 @@ namespace Service
             }
             patientInvestigation.InvestigationDetails = await _repository.InvestigationDetailsRepository.GetInvestigationDetailByPatientInvestigationId(patientInvestigationId, false);
             var patientInvestigationDto = _mapper.Map<PatientInvestigationDto>(patientInvestigation);
+            if (patientInvestigationDto.DoctorId.HasValue)
+            {
+                patientInvestigationDto.DoctorName = _repository.Doctor.GetDoctorAsync(patientInvestigationDto.DoctorId.Value, false).Result.Name;
+            }
+            else
+            {
+                patientInvestigationDto.DoctorName = "Unknown Doctor";
+            }
 
             return new ApiOkResponse<PatientInvestigationDto>(patientInvestigationDto, "Patient Investigation Created Successfully");
         }

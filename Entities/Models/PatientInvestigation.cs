@@ -42,6 +42,8 @@
         public void UpdateDueAmount()
         {
             DueAmount = TotalAmount - PaidAmount - DiscountAmount;
+            if (DueAmount < 1)
+                DueAmount = 0;
         }
 
         // Method to add a detail and recalculate
