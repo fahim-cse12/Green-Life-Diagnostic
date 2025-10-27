@@ -5,6 +5,7 @@ using Entities.Models;
 using Entities.Responses;
 using LoggerService;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Service.Contracts;
@@ -23,17 +24,20 @@ namespace Service
         private readonly UserManager<User> _userManager;
         private readonly IOptions<JwtConfiguration> _configuration;
         private readonly JwtConfiguration _jwtConfiguration;
+        private readonly IConfiguration _config;
+
 
         private User? _user;
 
         public AuthenticationService(ILoggerManager logger, IMapper mapper,
-        UserManager<User> userManager, IOptions<JwtConfiguration> configuration)
+        UserManager<User> userManager, IOptions<JwtConfiguration> configuration, IConfiguration config)
         {
             _logger = logger;
             _mapper = mapper;
             _userManager = userManager;
             _configuration = configuration;
             _jwtConfiguration = _configuration.Value;
+            _config = config;
         }
 
         public async Task<TokenDto> CreateToken(bool populateExp)
@@ -52,9 +56,16 @@ namespace Service
         }
         private SigningCredentials GetSigningCredentials()
         {
-            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY"));
-            var secret = new SymmetricSecurityKey(key);
-            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+            // Read the secret key from appsettings.json
+            var secretKey = _config["JwtConfiguration:SECRET_KEY"];
+
+            if (string.IsNullOrEmpty(secretKey))
+                throw new InvalidOperationException("JWT secret key is missing from configuration.");
+
+            // var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY"));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            //var secret = new SymmetricSecurityKey(key);
+            return new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         }
         private async Task<List<Claim>> GetClaims()
         {
@@ -130,12 +141,20 @@ namespace Service
 
         private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
+            var secretKey = _config["JwtConfiguration:SECRET_KEY"];
+
+            if (string.IsNullOrEmpty(secretKey))
+                throw new InvalidOperationException("JWT secret key is missing from configuration.");
+
+            // var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY"));
+            var issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = true,
                 ValidateIssuer = true,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET_KEY"))),
+                IssuerSigningKey = issuerSigningKey,
                 ValidateLifetime = true,
                 ValidIssuer = _jwtConfiguration.ValidIssuer,
                 ValidAudience = _jwtConfiguration.ValidAudience

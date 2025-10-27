@@ -6,6 +6,7 @@ using FluentValidation;
 using LoggerService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Service.Contracts;
@@ -28,6 +29,7 @@ namespace Service
         private readonly IOptions<JwtConfiguration> _configuration;
         private readonly JwtConfiguration _jwtConfiguration;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IConfiguration _config;
         public ServiceManager(
             IRepositoryManager repositoryManager,
             ILoggerManager logger,
@@ -35,7 +37,8 @@ namespace Service
             UserManager<User> userManager,
             IOptions<JwtConfiguration> configuration,            
             IServiceProvider serviceProvider,
-            IHttpContextAccessor contextAccessor)
+            IHttpContextAccessor contextAccessor,
+            IConfiguration config)
         {
             _doctorService = new Lazy<IDoctorService>(() => new DoctorService(
                 repositoryManager,
@@ -70,7 +73,7 @@ namespace Service
                 repositoryManager));
 
             _userService = new Lazy<IUserService>(() => new UserService(repositoryManager, logger, mapper));
-            _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration));
+            _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration,config));
             _configuration = configuration;
             _jwtConfiguration = _configuration.Value;
         }
