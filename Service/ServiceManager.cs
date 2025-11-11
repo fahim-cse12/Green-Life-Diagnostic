@@ -26,6 +26,7 @@ namespace Service
         private readonly Lazy<IUserService> _userService;
         private readonly Lazy<IAuthenticationService> _authenticationService;
         private readonly Lazy<IDashboardService> _dashboardService;
+        private readonly Lazy<IRoleService> _roleService;
         private readonly IOptions<JwtConfiguration> _configuration;
         private readonly JwtConfiguration _jwtConfiguration;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -71,6 +72,7 @@ namespace Service
                 repositoryManager)); 
             _dashboardService = new Lazy<IDashboardService>(() => new DashboardService(
                 repositoryManager));
+            _roleService = new Lazy<IRoleService>(() => new RoleService(serviceProvider.GetRequiredService<RoleManager<IdentityRole>>()));
 
             _userService = new Lazy<IUserService>(() => new UserService(repositoryManager, logger, mapper));
             _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration,config));
@@ -88,5 +90,6 @@ namespace Service
         public IUserService userService => _userService.Value;  
         public IAuthenticationService authenticationService => _authenticationService.Value;
         public IDashboardService dashboardService => _dashboardService.Value;
+        public IRoleService roleService => _roleService.Value;
     }
 }
