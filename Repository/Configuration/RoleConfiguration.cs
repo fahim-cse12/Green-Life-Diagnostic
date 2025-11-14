@@ -12,7 +12,7 @@ namespace Repository.Configuration
             new IdentityRole
             {
                 Name = "Administrator",
-                NormalizedName = "ADMINISTRATOR"
+                NormalizedName = "ADMIN"
                
             },
             new IdentityRole

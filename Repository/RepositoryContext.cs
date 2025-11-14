@@ -15,7 +15,7 @@ namespace Repository
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+          //  modelBuilder.ApplyConfiguration(new RoleConfiguration());
 
             // mark all non entity types in DBContext
             foreach (Type type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes())
@@ -34,6 +34,7 @@ namespace Repository
             }
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
+
 
         public DbSet<Doctor>? Doctors { get; set; }
         public DbSet<FinancialRecord>? FinancialRecords { get; set; }

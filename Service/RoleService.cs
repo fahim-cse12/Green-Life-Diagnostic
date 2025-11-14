@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Entities.Responses;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Service.Contracts;
+using Shared.DataTransferObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +17,25 @@ namespace Service
 
         public RoleService(RoleManager<IdentityRole> roleManager)
         {
-            roleManager = _roleManager;
+            _roleManager = roleManager;
+        }
+        public async Task<ApiBaseResponse> GetAllRolesAsync()
+        {
+            var roles = await _roleManager.Roles
+                     .Select(r => new RoleDto(
+                         r.Id ?? string.Empty,
+                         r.Name ?? string.Empty
+                     ))
+                     .ToListAsync();
+
+            return new ApiOkResponse<List<RoleDto>>(roles, "Get All Roles successfully");
+
         }
 
-        public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
-        {
-            return await _roleManager.Roles.ToListAsync();
-        }
+        //public async Task<IEnumerable<IdentityRole>> GetAllRolesAsync()
+        //{
+        //    return await _roleManager.Roles.ToListAsync();
+        //}
 
         public async Task<IdentityRole?> GetRoleByAsync(string roleId)
         {
@@ -72,5 +86,7 @@ namespace Service
             return await _roleManager.DeleteAsync(role);
 
         }
+
+
     }
 }

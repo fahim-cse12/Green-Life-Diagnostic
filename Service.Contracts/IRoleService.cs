@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Entities.Models;
+using Entities.Responses;
+using Microsoft.AspNetCore.Identity;
+using Shared.DataTransferObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +12,7 @@ namespace Service.Contracts
 {
     public interface IRoleService
     {
-        Task<IEnumerable<IdentityRole>> GetAllRolesAsync();
+        Task<ApiBaseResponse> GetAllRolesAsync();
         Task<IdentityRole?> GetRoleByAsync(string roleId);
         Task<IdentityResult> CreateRoleAsync(string roleName);
         Task<IdentityResult> UpdateRoleAsync(string roleId, string roleName);
