@@ -7,6 +7,7 @@ namespace GreenLife.Presentation.Controllers
 {
     public class ApiBaseController : ControllerBase
     {
+        [NonAction]
         public IActionResult ProcessError(ApiBaseResponse baseResponse)
         {
             return baseResponse switch
