@@ -9,5 +9,10 @@ namespace Service.Contracts
         Task<bool> ValidateUser(UserForAuthenticationDto userForAuth);
         Task<TokenDto> CreateToken(bool populateExp);
         Task<TokenDto> RefreshToken(TokenDto tokenDto);
+
+        Task<ApiBaseResponse> ChangePasswordAsync(
+            Guid userId,
+            ChangePasswordRequestDto request,
+            CancellationToken cancellationToken = default);
     }
 }

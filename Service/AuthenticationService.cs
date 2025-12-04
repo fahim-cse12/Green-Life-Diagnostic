@@ -170,5 +170,35 @@ namespace Service
             return principal;
         }
 
+        public async Task<ApiBaseResponse> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto request, CancellationToken cancellationToken = default)
+        {
+            if (request.NewPassword != request.ConfirmPassword)
+            {
+                return new ApiErrorResponse("Validation failed", "New password and confirm password do not match.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                return new IdNotFoundResponse<User>(userId);
+               
+            }
+
+            var result = await _userManager.ChangePasswordAsync(
+                user,
+                request.CurrentPassword,
+                request.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                _logger.LogWarn($"{nameof(ChangePasswordAsync)}: Change Password failed");
+                // Replace with your own ValidationException / AppException
+                var errorMessages = result.Errors.Select(e => e.Description).ToList();
+                return new ApiErrorResponse("Change Password failed", errorMessages);
+            }
+
+            return new ApiOkResponse<ChangePasswordRequestDto>(request, "Password Changed successfully");
+        }
     }
 }

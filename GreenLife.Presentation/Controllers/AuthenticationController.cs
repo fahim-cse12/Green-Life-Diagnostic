@@ -3,6 +3,7 @@ using GreenLife.Presentation.ActionFilter;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using System.Security.Claims;
 
 namespace GreenLife.Presentation.Controllers
 {
@@ -35,6 +36,23 @@ namespace GreenLife.Presentation.Controllers
                 return Unauthorized();
             var tokenDto = await _service.authenticationService.CreateToken(populateExp: true);
             return Ok(tokenDto);
+        }
+
+        [HttpPost("changepassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
+        {
+            // Get currently logged-in user's ID from JWT claims
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                // token is invalid or not a proper GUID
+                return Unauthorized();
+            }
+
+            var result = await _service.authenticationService.ChangePasswordAsync(userId, request);
+
+            // No content if everything went well
+            return Ok(result);
         }
     }
 }
