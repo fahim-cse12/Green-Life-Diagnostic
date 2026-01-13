@@ -6,7 +6,7 @@ using Shared.DataTransferObject;
 
 namespace GreenLife.Presentation.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("api/doctors")]
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]

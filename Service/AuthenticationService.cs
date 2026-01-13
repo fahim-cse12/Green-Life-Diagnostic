@@ -95,17 +95,41 @@ namespace Service
         public async Task<ApiBaseResponse> RegisterUser(UserForRegistrationDto userForRegistration)
         {
             var user = _mapper.Map<User>(userForRegistration);
-            var result = await _userManager.CreateAsync(user, userForRegistration.Password);
-            if (result.Succeeded)
-                await _userManager.AddToRolesAsync(user, userForRegistration.Roles);
-            else
+
+            var createResult = await _userManager.CreateAsync(user, userForRegistration.Password);
+            if (!createResult.Succeeded)
             {
-                var errorMessages = result.Errors.Select(e => e.Description).ToList();
+                var errorMessages = createResult.Errors.Select(e => e.Description).ToList();
                 return new ApiErrorResponse("Validation failed", errorMessages);
             }
-            return new ApiOkResponse<UserForRegistrationDto>(userForRegistration, "User created successfully");
 
+            // ✅ Check AddToRolesAsync result
+            var roleResult = await _userManager.AddToRolesAsync(user, userForRegistration.Roles);
+
+            if (!roleResult.Succeeded)
+            {
+                var errorMessages = roleResult.Errors.Select(e => e.Description).ToList();
+                return new ApiErrorResponse("Failed to assign roles", errorMessages);
+            }
+
+            return new ApiOkResponse<UserForRegistrationDto>(userForRegistration, "User created successfully");
         }
+
+
+        //public async Task<ApiBaseResponse> RegisterUser(UserForRegistrationDto userForRegistration)
+        //{
+        //    var user = _mapper.Map<User>(userForRegistration);
+        //    var result = await _userManager.CreateAsync(user, userForRegistration.Password);
+        //    if (result.Succeeded)
+        //        await _userManager.AddToRolesAsync(user, userForRegistration.Roles);
+        //    else
+        //    {
+        //        var errorMessages = result.Errors.Select(e => e.Description).ToList();
+        //        return new ApiErrorResponse("Validation failed", errorMessages);
+        //    }
+        //    return new ApiOkResponse<UserForRegistrationDto>(userForRegistration, "User created successfully");
+
+        //}
 
         public async Task<bool> ValidateUser(UserForAuthenticationDto userForAuth)
         {
